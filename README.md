@@ -9,8 +9,7 @@ Possible general use for athletes, at-home diagnostics, personal use, etc.
 ## Features
 A wearable knee sensor that can accurately measure a user’s knee angle within ± 5°
 The sensor is wireless and transmits data without physical connections
-The sensor runs off of battery power
-The sensor is adjustable, ensuring a wide range of users can wear it comfortably
+The battery powered sensor is adjustable, ensuring a wide range of users can wear it comfortably
 Users can hear music that is equivalent to the BPM they want to walk to
 
 This code contains the components of the accompanying Music App that will be used with the Knee Sensor
