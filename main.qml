@@ -5,9 +5,29 @@ ApplicationWindow {
     width: 1080
     height: 720
     title: "HelloApp"
-    Text {
-        anchors.centerIn: parent
-        text: "Hello World"
-        font.pixelSize: 24
+    Rectangle {
+      anchors {
+        top: parent.top
+        topMargin: 25
+        left: parent.left
+        leftMargin: 25
+      }
+        width: 100
+        height: 100
+        color: "white"
+        border.color: "black"
+        border.width: 1
+        radius: width*0.5
+        Text {
+          anchors {
+            top: parent.top
+            topMargin: 35
+            left: parent.left
+            leftMargin: 30
+          }
+          color: "black"
+          text: "RAS"
+          font.pixelSize: 24
+        }
     }
 }
