@@ -66,6 +66,7 @@ class Example(QWidget):
 
     def first_page(self):
         self.stacked_widget.setCurrentIndex(0)
+        
 
     def second_page(self):
         self.stacked_widget.setCurrentIndex(1)
