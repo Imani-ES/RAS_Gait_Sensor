@@ -1,5 +1,7 @@
 # for the desktop app, get address of pi and connect
 # not sure how to allow any device to pair without initial IP address though
+#have the desktop connect to two different hosts (Won't need multiple threads, have two pis)
+#
 
 import socket
 
