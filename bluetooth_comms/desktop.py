@@ -5,21 +5,26 @@
 
 import socket
 
-pi_addr= '?' # we can get  
-port = 3 
-backlog = 1
-size = 1024
-blue_pi = socket.socket(socket.AF_BLUETOOTH, socket.SOCK_STREAM, socket.BTPROTO_RFCOMM)
-blue_pi.bind((pi_addr,port))
-blue_pi.listen(backlog)
-try:
-    client, address = blue_pi.accept()
-    while 1:
-        data = client.recv(size)
-        if data:
-            print(data)
-            client.send(data)
-except:	
-    print("Closing socket")	
-    client.close()
-    blue_pi.close()
+# get addresses
+port = 3
+desk_addr = '?'#need to find with hconfig i believe
+
+#establish bluetooth socket 
+blue_desk = socket.socket(socket.AF_BLUETOOTH, socket.SOCK_STREAM, socket.BTPROTO_RFCOMM)
+blue_desk.connect((desk_addr,port))
+blue_desk.send(bytes('greetings from app'),'UFT-8')
+while 1:
+    #input = data sent over socket
+    text = input()
+
+    if text == "greeting":
+        print("Greeting from raspberry")
+
+    elif text == "disconnect":
+        break
+    blue_desk.send(bytes(text, 'UTF-8'))
+
+blue_desk.close()
+
+def angle_converter(input):
+    return 0
