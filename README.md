@@ -16,3 +16,8 @@ This code contains the components of the accompanying Music App that will be use
 
 ### Collaborators:
 Imani Muhammad-Graham, Kexin Chen, Seongjae Shin, Andrew Talamo
+
+## Resources
+https://github.com/pyqt/examples
+https://blog.kevindoran.co/bluetooth-programming-with-python-3/
+https://codezup.com/socket-server-with-multiple-clients-model-multithreading-python/
