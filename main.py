@@ -8,7 +8,7 @@ def startApp():
 
     engine = QQmlApplicationEngine()
     engine.quit.connect(app.quit)
-    engine.load('./pages.qml')
+    engine.load('./main.qml')
 
     sys.exit(app.exec())
 

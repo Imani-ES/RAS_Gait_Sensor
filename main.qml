@@ -1,156 +1,124 @@
-import QtQuick 2.15
-import QtQuick.Controls 2.15
-//window containing the application
+import QtQuick 2.7
+import QtQuick.Controls 2.0
+
 ApplicationWindow {
+    id: window
+    width: 1080
+    height: 720
+    visible: true
 
-  visible: true
-  width: 1080
-  height: 720
-  title: "HelloApp"
-
-  // RAS logo
-  Rectangle {
-    anchors {
-      top: parent.top
-      topMargin: 25
-      left: parent.left
-      leftMargin: 25
-    }
-      width: 100
-      height: 100
-      color: "white"
-      border.color: "black"
-      border.width: 2
-      radius: width*0.5
-      Text {
-        anchors {
-          top: parent.top
-          topMargin: 35
-          left: parent.left
-          leftMargin: 30
+    header: TabBar {
+        TabButton {
+          implicitHeight: 70
+          font.pixelSize: 30
+          text: "Home"
+          onClicked: stackView.replace(page1)
         }
-        color: "black"
-        text: "RAS"
-        font.pixelSize: 24
+        TabButton {
+          implicitHeight: 70
+          font.pixelSize: 30
+          text: "About"
+          onClicked: stackView.replace(page2)
+        }
+        TabButton {
+          implicitHeight: 70
+          font.pixelSize: 30
+          text: "Connect"
+          onClicked: stackView.replace(page3)
+        }
+        TabButton {
+          implicitHeight: 70
+          font.pixelSize: 30
+          text: "View"
+          onClicked: stackView.replace(page4)
+        }
+        TabButton {
+          implicitHeight: 70
+          font.pixelSize: 30
+          text: "Audio"
+          onClicked: stackView.replace(page5)
+        }
+        TabButton {
+          implicitHeight: 70
+          font.pixelSize: 30
+          text: "Settings"
+          onClicked: stackView.replace(page6)
+        }
+
+    }
+
+    Component {
+      id: page1
+      Page {
+        Label {
+          text: qsTr("First page")
+          anchors.centerIn: parent
+        }
       }
-  }
+    }
 
-  // Menu tab
-  Rectangle {
-    anchors {
-      top: parent.top
-      topMargin: 48
-      left: parent.left
-      leftMargin: 148
-    }
-      width: 904
-      height: 54
-      color: "white"
-      border.color: "black"
-      border.width: 2
-  }
-
-  // button 1
-  Button {
-    anchors {
-      top: parent.top
-      topMargin: 50
-      left: parent.left
-      leftMargin: 150
-    }
-        text: "Home"
-        font.pixelSize: 30
-        background: Rectangle {
-          implicitWidth: 150
-          implicitHeight: 50
-                color: parent.down ? "#E0E0E0" :
-                        (parent.hovered ? "#FFFFFF" : "#FFFFFF")
+    Component {
+      id: page2
+      Page {
+        Label {
+          text: qsTr("Second page")
+          anchors.centerIn: parent
         }
-    }
-  // button 2
-  Button {
-    anchors {
-      top: parent.top
-      topMargin: 50
-      left: parent.left
-      leftMargin: 300
-    }
-        text: "About"
-        font.pixelSize: 30
-        background: Rectangle {
-          implicitWidth: 150
-          implicitHeight: 50
-                color: parent.down ? "#E0E0E0" :
-                        (parent.hovered ? "#FFFFFF" : "#FFFFFF")
-        }
-    }
-  // button 3
-  Button {
-    anchors {
-      top: parent.top
-      topMargin: 50
-      left: parent.left
-      leftMargin: 450
-    }
-        text: "Connect"
-        font.pixelSize: 30
-        background: Rectangle {
-          implicitWidth: 150
-          implicitHeight: 50
-                color: parent.down ? "#E0E0E0" :
-                        (parent.hovered ? "#FFFFFF" : "#FFFFFF")
-        }
-    }
-  // button 4
-  Button {
-    anchors {
-      top: parent.top
-      topMargin: 50
-      left: parent.left
-      leftMargin: 600
-    }
-        text: "View"
-        font.pixelSize: 30
-        background: Rectangle {
-          implicitWidth: 150
-          implicitHeight: 50
-                color: parent.down ? "#E0E0E0" :
-                        (parent.hovered ? "#FFFFFF" : "#FFFFFF")
-        }
-    }
-  // button 5
-    Button {
-      anchors {
-        top: parent.top
-        topMargin: 50
-        left: parent.left
-        leftMargin: 750
       }
-        text: "Audio"
-        font.pixelSize: 30
-        background: Rectangle {
-          implicitWidth: 150
-          implicitHeight: 50
-                color: parent.down ? "#E0E0E0" :
-                        (parent.hovered ? "#FFFFFF" : "#FFFFFF")
-        }
+    }
 
-    }
-  // button 6
-  Button {
-    anchors {
-      top: parent.top
-      topMargin: 50
-      left: parent.left
-      leftMargin: 900
-    }
-      text: "Settings"
-      font.pixelSize: 30
-      background: Rectangle {
-        implicitWidth: 150
-        implicitHeight: 50
-              color: parent.down ? "#E0E0E0" :
-                      (parent.hovered ? "#FFFFFF" : "#FFFFFF")
+    Component {
+      id: page3
+      Page {
+        Label {
+          text: qsTr("Third page")
+          anchors.centerIn: parent
+        }
       }
-  }
+    }
+
+    Component {
+      id: page4
+      Page {
+        Label {
+          text: qsTr("Fourth page")
+          anchors.centerIn: parent
+        }
+      }
+    }
+
+    Component {
+      id: page5
+      Page {
+        Label {
+          text: qsTr("Fifth page")
+          anchors.centerIn: parent
+        }
+      }
+    }
+
+    Component {
+      id: page6
+      Page {
+        Label {
+          text: qsTr("Sixth page")
+          anchors.centerIn: parent
+        }
+      }
+    }
+
+
+
+    StackView {
+        id: stackView
+        anchors.fill: parent
+        replaceEnter: Transition {
+            NumberAnimation { property: "opacity"; to: 1.0; duration: 1 }
+        }
+        replaceExit: Transition {
+            NumberAnimation { property: "opacity"; to: 0.0; duration: 1 }
+        }
+    }
+
+    Component.onCompleted: stackView.push(page1)
 }
