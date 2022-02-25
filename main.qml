@@ -39,12 +39,12 @@ ApplicationWindow {
   Rectangle {
     anchors {
       top: parent.top
-      topMargin: 40
+      topMargin: 48
       left: parent.left
-      leftMargin: 140
+      leftMargin: 148
     }
-      width: 920
-      height: 70
+      width: 904
+      height: 54
       color: "white"
       border.color: "black"
       border.width: 2
@@ -58,13 +58,13 @@ ApplicationWindow {
       left: parent.left
       leftMargin: 150
     }
-        id: button_1
         text: "Home"
         font.pixelSize: 30
         background: Rectangle {
-            implicitWidth: 150
-            implicitHeight: 50
-            color: button.down ? "#d6d6d6" : "#f6f6f6"
+          implicitWidth: 150
+          implicitHeight: 50
+                color: parent.down ? "#E0E0E0" :
+                        (parent.hovered ? "#FFFFFF" : "#FFFFFF")
         }
     }
   // button 2
@@ -75,13 +75,13 @@ ApplicationWindow {
       left: parent.left
       leftMargin: 300
     }
-        id: button_2
         text: "About"
         font.pixelSize: 30
         background: Rectangle {
-            implicitWidth: 150
-            implicitHeight: 50
-            color: button.down ? "#d6d6d6" : "#f6f6f6"
+          implicitWidth: 150
+          implicitHeight: 50
+                color: parent.down ? "#E0E0E0" :
+                        (parent.hovered ? "#FFFFFF" : "#FFFFFF")
         }
     }
   // button 3
@@ -92,13 +92,13 @@ ApplicationWindow {
       left: parent.left
       leftMargin: 450
     }
-        id: button_3
         text: "Connect"
         font.pixelSize: 30
         background: Rectangle {
-            implicitWidth: 150
-            implicitHeight: 50
-            color: button.down ? "#d6d6d6" : "#f6f6f6"
+          implicitWidth: 150
+          implicitHeight: 50
+                color: parent.down ? "#E0E0E0" :
+                        (parent.hovered ? "#FFFFFF" : "#FFFFFF")
         }
     }
   // button 4
@@ -109,31 +109,32 @@ ApplicationWindow {
       left: parent.left
       leftMargin: 600
     }
-        id: button_4
         text: "View"
         font.pixelSize: 30
         background: Rectangle {
-            implicitWidth: 150
-            implicitHeight: 50
-            color: button.down ? "#d6d6d6" : "#f6f6f6"
+          implicitWidth: 150
+          implicitHeight: 50
+                color: parent.down ? "#E0E0E0" :
+                        (parent.hovered ? "#FFFFFF" : "#FFFFFF")
         }
     }
   // button 5
-  Button {
-    anchors {
-      top: parent.top
-      topMargin: 50
-      left: parent.left
-      leftMargin: 750
-    }
-        id: button_5
+    Button {
+      anchors {
+        top: parent.top
+        topMargin: 50
+        left: parent.left
+        leftMargin: 750
+      }
         text: "Audio"
         font.pixelSize: 30
         background: Rectangle {
-            implicitWidth: 150
-            implicitHeight: 50
-            color: button.down ? "#d6d6d6" : "#f6f6f6"
+          implicitWidth: 150
+          implicitHeight: 50
+                color: parent.down ? "#E0E0E0" :
+                        (parent.hovered ? "#FFFFFF" : "#FFFFFF")
         }
+
     }
   // button 6
   Button {
@@ -143,13 +144,13 @@ ApplicationWindow {
       left: parent.left
       leftMargin: 900
     }
-      id: button
       text: "Settings"
       font.pixelSize: 30
       background: Rectangle {
-          implicitWidth: 150
-          implicitHeight: 50
-          color: button.down ? "#d6d6d6" : "#f6f6f6"
+        implicitWidth: 150
+        implicitHeight: 50
+              color: parent.down ? "#E0E0E0" :
+                      (parent.hovered ? "#FFFFFF" : "#FFFFFF")
       }
   }
 }
