@@ -17,11 +17,11 @@ print("Blue_Pi listening at "+pi_addr+":"+port)
 #handle socket communication
 try:
     client, address = blue_pi.accept()
-    print("Connected to "+client)
+    print("Connected to "+ str(client))
     while 1:
         data = client.recv(size)
         if data:
-            print("Recieved "+data +" from "+client)
+            print("Recieved "+ str(data) +" from "+ str(client))
             client.send(data)
 except:	
     print("Closing socket")	
