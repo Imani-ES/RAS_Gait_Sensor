@@ -8,9 +8,12 @@ import socket
 def lengthVsVoltage(x):
     return (x + 0.0729) / 0.0329
 
+l0 = 0
+l90 = 0
+firstMeasure = True
+
 def normalLen(x):
-    l0 = 8.26
-    l90 = 10.88
+    
     return ((x - l0) / (l90-l0) )*90
 
 # get addresses
@@ -28,10 +31,21 @@ while 1:
     from_server = blue_pi_1.recv(4096)
     from_server_d = from_server.decode()
 
-
     estLen = lengthVsVoltage(float(from_server_d))
-    print ('Voltage: ' + from_server_d + ' V | Estimated Length: ' + (str(estLen)) + ' | Estimated Angle: ' + (str(normalLen(estLen))))
 
+    print ('Voltage: ' + from_server_d + ' V | Estimated Length: ' + (str(estLen)))
+
+    if l0 == 0:
+        if firstMeasure:
+            input("Press enter when ready to calibrate 0 degrees")
+            l0 = estLen
+            firstMeasure = False
+
+
+    print ('Voltage: ' + from_server_d + ' V | Estimated Length: ' + (str(estLen))) 
+    # + ' | Estimated Angle: ' + (str(normalLen(estLen))))
+
+     
 blue_pi_1.close()
 
 def angle_converter(input):
