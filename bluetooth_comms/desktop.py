@@ -4,16 +4,17 @@
 #
 
 import socket
+import keyboard
+
+#Global variables for calibration
+l0 = None
+l90 = None
+fullyCalibrate = False
 
 def lengthVsVoltage(x):
     return (x + 0.0729) / 0.0329
 
-l0 = 0
-l90 = 0
-firstMeasure = True
-
 def normalLen(x):
-    
     return ((x - l0) / (l90-l0) )*90
 
 # get addresses
@@ -26,6 +27,29 @@ blue_pi_1 = socket.socket(socket.AF_BLUETOOTH, socket.SOCK_STREAM, socket.BTPROT
 blue_pi_1.connect((pi_1_addr,port))
 blue_pi_1.send(bytes('greetings from app','UTF-8'))
 
+def calibrate():
+    global l0, l90, fullyCalibrate
+    #Check if sensor is already calibrated
+    if not fullyCalibrate:
+        #First Calibrate 0 degrees
+        if not l0:
+            l0 = lengthVsVoltage(float(blue_pi_1.recv(4096).decode()))
+            print('Calibrated at 0 degrees: ', l0)
+        #Upon second space press calibrate 90 degrees
+        else:
+            l90 = lengthVsVoltage(float(blue_pi_1.recv(4096).decode()))
+            print('Calibrated at 90 degrees: ', l90)
+            
+            #Flag that sensor is calibrated
+            fullyCalibrate = True
+            print('Sensor is calibrated!')
+    else:
+        #Tell user sensor is calibrated
+        print('Sensor is already calibrated!')
+
+
+keyboard.add_hotkey('space', calibrate)
+
 while 1:
 
     from_server = blue_pi_1.recv(4096)
@@ -33,17 +57,16 @@ while 1:
 
     estLen = lengthVsVoltage(float(from_server_d))
 
-    print ('Voltage: ' + from_server_d + ' V | Estimated Length: ' + (str(estLen)))
+    #Check if user pressed enter
+    
 
-    if l0 == 0:
-        if firstMeasure:
-            input("Press enter when ready to calibrate 0 degrees")
-            l0 = estLen
-            firstMeasure = False
-
-
-    print ('Voltage: ' + from_server_d + ' V | Estimated Length: ' + (str(estLen))) 
+    if not fullyCalibrate:
+        print ('Voltage: ' + from_server_d + ' V | Estimated Length: ' + (str(estLen))) 
+        print ('Calibrated l0, l90: (', l0, ', ', l90, ')')
+        print ('----------------------------------------')
     # + ' | Estimated Angle: ' + (str(normalLen(estLen))))
+    else:
+        print(normalLen(estLen))
 
      
 blue_pi_1.close()
