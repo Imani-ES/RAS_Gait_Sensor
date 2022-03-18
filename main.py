@@ -23,7 +23,7 @@ def startApp():
     path is the filepath to the song
     soundFilePath just checks if the path exists
     '''
-    path = "./music/playlists/95-100_bpm/Lynyrd Skynyrd - Sweet Home Alabama.wav"
+    path = "./music/playlists/105-110_bpm/Pirates of the Caribbean Theme.wav"
     soundFilePath = exists(path)
     #print(soundFilePath)
 
