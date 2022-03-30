@@ -54,7 +54,104 @@ ApplicationWindow {
       id: page1
       Page {
         Label {
-          text: qsTr("First page")
+          anchors.centerIn: parent
+        }
+        Item {
+          id: button_round
+          width: 400
+          height: 400
+          property alias buttonText: innerText.text;
+          property color color: "white"
+          property color hoverColor: "#aaaaaa"
+          property int fontSize: 10
+          property int borderWidth: 1
+          property int borderRadius: 2
+          scale: state === "Pressed" ? 0.96 : 1.0
+          onEnabledChanged: state = ""
+          signal clicked
+          anchors.centerIn: parent
+
+          //define a scale animation
+          Behavior on scale {
+            NumberAnimation {
+              duration: 100
+              easing.type: Easing.InOutQuad
+            }
+          }
+
+          //Rectangle to draw the button
+          Rectangle {
+            radius: 400
+            id: rectanglebutton_round
+            anchors.fill: parent
+            color: button_round.enabled ? "#33FF33" : "#006600"
+
+            Text {
+                id: innerText
+                text: "Start"
+                font.pointSize: 20
+                color: "#000000"
+                anchors.centerIn: parent
+            }
+          }
+
+          //change the color of the button in differen button states
+          states: [
+            State {
+              name: "Hovering"
+              PropertyChanges {
+                target: rectanglebutton_round
+                color: "#00CC00"
+              }
+            },
+            State {
+              name: "Pressed"
+              PropertyChanges {
+                target: rectanglebutton_round
+                color: "#009900"
+              }
+            }
+          ]
+
+          //define transmission for the states
+          transitions: [
+            Transition {
+              from: ""; to: "Hovering"
+              ColorAnimation { duration: 10 }
+            },
+            Transition {
+              from: "*"; to: "Pressed"
+              ColorAnimation { duration: 10 }
+            }
+          ]
+
+          //Mouse area to react on click events
+          MouseArea {
+            hoverEnabled: true
+            anchors.fill: button_round
+            onEntered: { button_round.state='Hovering'}
+            onExited: { button_round.state=''}
+            onClicked: {
+              button_round.clicked();
+              stackView.replace(page1_2)
+            }
+            onPressed: { button_round.state="Pressed" }
+            onReleased: {
+              if (containsMouse)
+                button_round.state="Hovering";
+              else
+                button_round.state="";
+            }
+          }
+        }
+      }
+    }
+
+    Component {
+      id: page1_2
+      Page {
+        Label {
+          text: qsTr("Calibration page")
           anchors.centerIn: parent
         }
       }
@@ -204,7 +301,6 @@ ApplicationWindow {
           property alias buttonText: innerText.text;
           property color color: "white"
           property color hoverColor: "#aaaaaa"
-          property color pressColor: "slategray"
           property int fontSize: 10
           property int borderWidth: 1
           property int borderRadius: 2
@@ -238,7 +334,7 @@ ApplicationWindow {
                 id: innerText
                 text: "Stop"
                 font.pointSize: 20
-                color: "#FFFFFF"
+                color: "#000000"
                 anchors.centerIn: parent
             }
           }
@@ -297,7 +393,6 @@ ApplicationWindow {
           property alias buttonText: innerText.text;
           property color color: "white"
           property color hoverColor: "#aaaaaa"
-          property color pressColor: "slategray"
           property int fontSize: 10
           property int borderWidth: 1
           property int borderRadius: 2
@@ -331,7 +426,7 @@ ApplicationWindow {
                 id: innerText_2
                 text: "Recalibrate"
                 font.pointSize: 20
-                color: "#FFFFFF"
+                color: "#000000"
                 anchors.centerIn: parent
             }
           }
