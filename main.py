@@ -1,5 +1,6 @@
 import sys
 from os.path import exists
+import wave
 
 from PyQt5.QtGui import QGuiApplication
 from PyQt5.QtQml import QQmlApplicationEngine
@@ -22,7 +23,7 @@ def startApp():
     path is the filepath to the song
     soundFilePath just checks if the path exists
     '''
-    path = "./music/playlists/95-100_bpm/Lynyrd Skynyrd - Sweet Home Alabama.wav"
+    path = "./music/playlists/105-110_bpm/Pirates of the Caribbean Theme.wav"
     soundFilePath = exists(path)
     #print(soundFilePath)
 
@@ -32,11 +33,27 @@ def startApp():
         soundFile.setFileName(path)
         soundFile.open(QIODevice.ReadOnly)
 
+        #Obtain the sample rate, sample width, and channel count
+        sampleRate = 0
+        sampleWidth = 0
+        channelCount = 0
+        with wave.open(path, "rb") as wav_file:
+            sampleRate = wav_file.getframerate()
+            sampleWidth = wav_file.getsampwidth()*8
+            channelCount = wav_file.getnchannels()
+        
+        '''
+        Song debug commands
+        print("Sample Rate: ", sampleRate)
+        print("Sample Size: ", sampleWidth)
+        print("Channel Count: ", channelCount)
+        '''
+
         #Create the settings to playback the audio
         format = QAudioFormat()
-        format.setSampleRate(44100)
-        format.setChannelCount(1)
-        format.setSampleSize(32)
+        format.setSampleRate(sampleRate)
+        format.setChannelCount(channelCount)
+        format.setSampleSize(sampleWidth)
         format.setCodec("audio/pcm")
         format.setByteOrder(QAudioFormat.LittleEndian)
         format.setSampleType(QAudioFormat.UnSignedInt)
