@@ -13,6 +13,7 @@ Pi_2_connected = False
 blue_pi_1 = None
 blue_pi_2 = None
 from_server_d1 = None
+from_server_d2 = None
 
 #Formula derived from own calculations, obtain the length
 def lengthVsVoltage(x):
@@ -27,6 +28,10 @@ def lengthVsVoltage(x):
 def normalLen(x, l0, l90):
     return ((x - l0) / (l90 - l0) )*90
  
+#Establish the bluetooth sockets and timeout
+blue_pi_1 = socket.socket(socket.AF_BLUETOOTH, socket.SOCK_STREAM, socket.BTPROTO_RFCOMM)
+blue_pi_2 = socket.socket(socket.AF_BLUETOOTH, socket.SOCK_STREAM, socket.BTPROTO_RFCOMM)
+
 #Hardcode the Pi bluetooth addresses
 port = 4
 pi_1_addr = 'B8:27:EB:03:EB:6D'
@@ -41,12 +46,12 @@ def calibrate():
         #First Calibrate 0 degrees
         if not l0_1 or not l0_2: 
             l0_1 = lengthVsVoltage(from_server_d1)
-            #l0_2 = lengthVsVoltage(float(blue_pi_2.recv(4096).decode()))
+            l0_2 = lengthVsVoltage(from_server_d2)
             print('Calibrated at 0 degrees')
         #Upon second space press calibrate 90 degrees
         else:
             l90_1 = lengthVsVoltage(from_server_d1)
-            #l90_2 = lengthVsVoltage(float(blue_pi_2.recv(4096).decode()))
+            l90_2 = lengthVsVoltage(from_server_d2)
             print('Calibrated at 90 degrees')
             
             #Flag that sensor is calibrated
@@ -60,26 +65,26 @@ def calibrate():
 keyboard.add_hotkey('space', calibrate)
 
 while 1:
-    #Establish the bluetooth sockets and timeout
-    blue_pi_1 = socket.socket(socket.AF_BLUETOOTH, socket.SOCK_STREAM, socket.BTPROTO_RFCOMM)
-    blue_pi_2 = socket.socket(socket.AF_BLUETOOTH, socket.SOCK_STREAM, socket.BTPROTO_RFCOMM)
-
     estLen_1 = 0
+    estLen_2 = 0
 
     #Check connection to Pi 1
     try:
-        print("Trying to connect to Pi 1")
-        blue_pi_1.connect((pi_1_addr, port))
-    except:
+        if not Pi_1_connected:
+            print("Trying to connect to Pi 1")
+            blue_pi_1.connect((pi_1_addr, port))
+        else:
+            blue_pi_1.sendall("1".encode())
+    except socket.error:
         print("Lost connection to Pi 1, reconnect!")
-        fullyCalibrate = False
-        l0_1 = None
-        l90_1 = None
+        Pi_1_connected = False
         blue_pi_1.close()
+        blue_pi_1 = socket.socket(socket.AF_BLUETOOTH, socket.SOCK_STREAM, socket.BTPROTO_RFCOMM)
         time.sleep(5)
         continue
     else:
         print("Pi 1 connected!")
+        Pi_1_connected = True
 
         #Receive data from pi 1, decode the data
         print("Trying to read from Pi 1...")
@@ -91,27 +96,33 @@ while 1:
         #Convert the voltage to length
         estLen_1 = lengthVsVoltage(from_server_d1)
 
-        #Close the socket
-        blue_pi_1.close()
-
-    #Check connection to Pi 2
-    '''
+   #Check connection to Pi 2
     try:
-        print("Trying to connect to Pi 2")
-        blue_pi_2.connect((pi_2_addr, port))
-    except:
+        if not Pi_2_connected:
+            print("Trying to connect to Pi 2")
+            blue_pi_2.connect((pi_2_addr, port))
+        else:
+            blue_pi_2.sendall("2".encode())
+    except socket.error:
         print("Lost connection to Pi 2, reconnect!")
-        fullyCalibrate = False
-        time.sleep(10)
+        Pi_2_connected = False
+        blue_pi_2.close()
+        blue_pi_2 = socket.socket(socket.AF_BLUETOOTH, socket.SOCK_STREAM, socket.BTPROTO_RFCOMM)
+        time.sleep(5)
         continue
     else:
-        print("Pi 2 is connected!")
+        print("Pi 2 connected!")
+        Pi_2_connected = True
 
         #Receive data from pi 2, decode the data
+        print("Trying to read from Pi 2...")
         from_server_2 = blue_pi_2.recv(4096)
-        from_server_d2 = from_server_2.decode()
-        blue_pi_2.close()
-    '''
+        from_server_d2 = from_server_2.decode()   
+
+        print("Data received! from 2")
+
+        #Convert the voltage to length
+        estLen_2 = lengthVsVoltage(from_server_d2)
 
     
     #estLen_2 = lengthVsVoltage(float(from_server_d2))    
@@ -122,7 +133,7 @@ while 1:
     else:
         print('--------------------')
         print(normalLen(estLen_1, l0_1, l90_1))
-        #print(normalLen(estLen_2, l0_2, l90_2))
+        print(normalLen(estLen_2, l0_2, l90_2))
         print('--------------------')
 
 def angle_converter(input):
