@@ -49,7 +49,7 @@ ApplicationWindow {
         }
 
     }
-
+    
     Component {
       id: page1
       Page {
