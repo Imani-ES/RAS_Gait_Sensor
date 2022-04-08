@@ -1,6 +1,7 @@
 import socket
 import keyboard
 import time
+from functools import partial
 
 #Global variables
 l0_1 = None
@@ -26,7 +27,11 @@ def lengthVsVoltage(x):
 
 #Formula calculated from research paper to convert length to angle
 def normalLen(x, l0, l90):
-    return ((x - l0) / (l90 - l0) )*90
+    try:
+        res = ((x - l0) / (l90 - l0) )*90
+        return res
+    except ZeroDivisionError:
+        print("Recalibrate, division by 0!")
  
 #Establish the bluetooth sockets and timeout
 blue_pi_1 = socket.socket(socket.AF_BLUETOOTH, socket.SOCK_STREAM, socket.BTPROTO_RFCOMM)
@@ -39,7 +44,7 @@ pi_2_addr = 'B8:27:EB:55:97:DE'
 
 #Knee sensor calibration function
 def calibrate():
-    global l0_1, l0_2, l90_1, l90_2, fullyCalibrate, estLen_1
+    global l0_1, l0_2, l90_1, l90_2, fullyCalibrate
 
     #Check if sensor is already calibrated
     if not fullyCalibrate:
@@ -61,8 +66,36 @@ def calibrate():
         #Tell user sensor is calibrated
         print('Sensors are already calibrated!')
 
+#Function to test just one sensor
+def testCalibrate(num_sensor):
+    global l0_1, l0_2, l90_1, l90_2, fullyCalibrate
+
+    #Check if sensor is already calibrated
+    if not fullyCalibrate:
+        #First Calibrate 0 degrees
+        if num_sensor == 1:
+            if not l0_1:
+                l0_1 = lengthVsVoltage(from_server_d1)
+                print('Calibrated at 0 degrees')
+            else:  
+                l90_1 = lengthVsVoltage(from_server_d1)
+                fullyCalibrate = True
+        else:
+            if not l0_2:  
+                l0_2 = lengthVsVoltage(from_server_d2)
+                print('Calibrated at 0 degrees')
+            else:
+                l90_2 = lengthVsVoltage(from_server_d2)
+                fullyCalibrate = True
+    else:
+        #Tell user sensor is calibrated
+        print('Sensors are already calibrated!')
+
 #Sets up 'interupt' to calibrate using space key
-keyboard.add_hotkey('space', calibrate)
+#keyboard.add_hotkey('space', calibrate)
+
+#Alternative calibrate for single sensor
+keyboard.add_hotkey('space', partial(testCalibrate, 1))
 
 while 1:
     estLen_1 = 0
@@ -83,20 +116,21 @@ while 1:
         time.sleep(5)
         continue
     else:
-        print("Pi 1 connected!")
+        #print("Pi 1 connected!")
         Pi_1_connected = True
 
         #Receive data from pi 1, decode the data
-        print("Trying to read from Pi 1...")
+        #print("Trying to read from Pi 1...")
         from_server_1 = blue_pi_1.recv(4096)
         from_server_d1 = from_server_1.decode()   
 
-        print("Data received!")
+        #print("Data received!")
 
         #Convert the voltage to length
         estLen_1 = lengthVsVoltage(from_server_d1)
 
-   #Check connection to Pi 2
+    '''
+    #Check connection to Pi 2
     try:
         if not Pi_2_connected:
             print("Trying to connect to Pi 2")
@@ -125,7 +159,8 @@ while 1:
         estLen_2 = lengthVsVoltage(from_server_d2)
 
     
-    #estLen_2 = lengthVsVoltage(float(from_server_d2))    
+    #estLen_2 = lengthVsVoltage(float(from_server_d2))   
+    '''
 
     #Check if both sensors are calibrated
     if not fullyCalibrate:
@@ -133,8 +168,9 @@ while 1:
     else:
         print('--------------------')
         print(normalLen(estLen_1, l0_1, l90_1))
-        print(normalLen(estLen_2, l0_2, l90_2))
+        #print(normalLen(estLen_2, l0_2, l90_2))
         print('--------------------')
+    
 
 def angle_converter(input):
     return 0
