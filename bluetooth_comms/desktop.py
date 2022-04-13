@@ -15,6 +15,8 @@ blue_pi_1 = None
 blue_pi_2 = None
 from_server_d1 = None
 from_server_d2 = None
+normLen1 = 0
+normLen2 = 0
 
 #Formula derived from own calculations, obtain the length
 def lengthVsVoltage(x):
@@ -97,80 +99,82 @@ def testCalibrate(num_sensor):
 #Alternative calibrate for single sensor
 keyboard.add_hotkey('space', partial(testCalibrate, 1))
 
-while 1:
-    estLen_1 = 0
-    estLen_2 = 0
-
-    #Check connection to Pi 1
-    try:
-        if not Pi_1_connected:
-            print("Trying to connect to Pi 1")
-            blue_pi_1.connect((pi_1_addr, port))
+def main():
+    global Pi_1_connected, Pi_2_connected, from_server_d1, from_server_d2, fullyCalibrate, normLen1, normLen2, blue_pi_1, blue_pi_2
+    while 1:
+        #Check connection to Pi 1
+        try:
+            if not Pi_1_connected:
+                print("Trying to connect to Pi 1")
+                blue_pi_1.connect((pi_1_addr, port))
+            else:
+                blue_pi_1.sendall("1".encode())
+        except socket.error:
+            print("Lost connection to Pi 1, reconnect!")
+            Pi_1_connected = False
+            blue_pi_1.close()
+            blue_pi_1 = socket.socket(socket.AF_BLUETOOTH, socket.SOCK_STREAM, socket.BTPROTO_RFCOMM)
+            time.sleep(5)
+            continue
         else:
-            blue_pi_1.sendall("1".encode())
-    except socket.error:
-        print("Lost connection to Pi 1, reconnect!")
-        Pi_1_connected = False
-        blue_pi_1.close()
-        blue_pi_1 = socket.socket(socket.AF_BLUETOOTH, socket.SOCK_STREAM, socket.BTPROTO_RFCOMM)
-        time.sleep(5)
-        continue
-    else:
-        #print("Pi 1 connected!")
-        Pi_1_connected = True
+            #print("Pi 1 connected!")
+            Pi_1_connected = True
 
-        #Receive data from pi 1, decode the data
-        #print("Trying to read from Pi 1...")
-        from_server_1 = blue_pi_1.recv(4096)
-        from_server_d1 = from_server_1.decode()   
+            #Receive data from pi 1, decode the data
+            #print("Trying to read from Pi 1...")
+            from_server_1 = blue_pi_1.recv(4096)
+            from_server_d1 = from_server_1.decode()   
 
-        #print("Data received!")
+            #print("Data received!")
 
-        #Convert the voltage to length
-        estLen_1 = lengthVsVoltage(from_server_d1)
+            #Convert the voltage to length
+            estLen_1 = lengthVsVoltage(from_server_d1)
 
-    '''
-    #Check connection to Pi 2
-    try:
-        if not Pi_2_connected:
-            print("Trying to connect to Pi 2")
-            blue_pi_2.connect((pi_2_addr, port))
+        '''
+        #Check connection to Pi 2
+        try:
+            if not Pi_2_connected:
+                print("Trying to connect to Pi 2")
+                blue_pi_2.connect((pi_2_addr, port))
+            else:
+                blue_pi_2.sendall("2".encode())
+        except socket.error:
+            print("Lost connection to Pi 2, reconnect!")
+            Pi_2_connected = False
+            blue_pi_2.close()
+            blue_pi_2 = socket.socket(socket.AF_BLUETOOTH, socket.SOCK_STREAM, socket.BTPROTO_RFCOMM)
+            time.sleep(5)
+            continue
         else:
-            blue_pi_2.sendall("2".encode())
-    except socket.error:
-        print("Lost connection to Pi 2, reconnect!")
-        Pi_2_connected = False
-        blue_pi_2.close()
-        blue_pi_2 = socket.socket(socket.AF_BLUETOOTH, socket.SOCK_STREAM, socket.BTPROTO_RFCOMM)
-        time.sleep(5)
-        continue
-    else:
-        print("Pi 2 connected!")
-        Pi_2_connected = True
+            print("Pi 2 connected!")
+            Pi_2_connected = True
 
-        #Receive data from pi 2, decode the data
-        print("Trying to read from Pi 2...")
-        from_server_2 = blue_pi_2.recv(4096)
-        from_server_d2 = from_server_2.decode()   
+            #Receive data from pi 2, decode the data
+            print("Trying to read from Pi 2...")
+            from_server_2 = blue_pi_2.recv(4096)
+            from_server_d2 = from_server_2.decode()   
 
-        print("Data received! from 2")
+            print("Data received! from 2")
 
-        #Convert the voltage to length
-        estLen_2 = lengthVsVoltage(from_server_d2)
+            #Convert the voltage to length
+            estLen_2 = lengthVsVoltage(from_server_d2)
 
-    
-    #estLen_2 = lengthVsVoltage(float(from_server_d2))   
-    '''
+        
+        #estLen_2 = lengthVsVoltage(float(from_server_d2))   
+        '''
 
-    #Check if both sensors are calibrated
-    if not fullyCalibrate:
-        print('Calibrate the sensors !')
-    else:
-        print('--------------------')
-        print(normalLen(estLen_1, l0_1, l90_1))
-        #print(normalLen(estLen_2, l0_2, l90_2))
-        print('--------------------')
-    
+        #Check if both sensors are calibrated
+        if not fullyCalibrate:
+            print('Calibrate the sensors !')
+        else:
+            print('--------------------')
+            normLen1 = normalLen(estLen_1, l0_1, l90_1)
+            print(normLen1)
+            #print(normalLen(estLen_2, l0_2, l90_2))
+            print('--------------------')
 
 def angle_converter(input):
     return 0
+
+if __name__ == "__main__":
+    main()
