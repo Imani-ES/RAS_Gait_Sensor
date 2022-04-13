@@ -518,7 +518,7 @@ ApplicationWindow {
             height: 450
             FolderListModel {
                     id: folderModel
-                    folder: "music/playlists/95-100_bpm"
+                    folder: "music/playlists/90-100_bpm"
                     nameFilters: ["*.mp3", "*.wav"]
                 }
 

@@ -11,8 +11,6 @@ from PyQt5.QtCore import QFile, QIODevice
 def startApp():
     app = QGuiApplication(sys.argv)
 
-    #set up blue tooth  - threadsfor each raspberry?
-
     engine = QQmlApplicationEngine()
     engine.quit.connect(app.quit)
     engine.load('./main.qml')
