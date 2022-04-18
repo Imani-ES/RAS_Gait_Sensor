@@ -2,6 +2,11 @@ import socket
 import keyboard
 import time
 from functools import partial
+import datetime as dt
+import matplotlib.pyplot as plt
+import matplotlib.animation as animation
+import threading
+import time
 
 #Global variables
 l0_1 = None
@@ -17,6 +22,12 @@ from_server_d1 = None
 from_server_d2 = None
 normLen1 = 0
 normLen2 = 0
+
+#Set up graphing stuff
+fig = plt.figure()
+ax = fig.add_subplot(1,1,1)
+xs = []
+ys = []
 
 #Formula derived from own calculations, obtain the length
 def lengthVsVoltage(x):
@@ -173,8 +184,38 @@ def main():
             #print(normalLen(estLen_2, l0_2, l90_2))
             print('--------------------')
 
-def angle_converter(input):
-    return 0
+def animate(i, xs, ys):
+    #Obtain knee sensor reading if calibrated
+    global fullyCalibrate, normLen1
+    print("Trying to animate graph")
+    if fullyCalibrate:
+        angle = normLen1
+
+        #Add knee data over realtime
+        xs.append(dt.datetime.now().strftime('%H:%M:%S.%f'))
+        ys.append(angle)
+
+        #Limit it to 20 items
+        xs = xs[-20:]
+        ys = ys[-20:]
+
+        #Draw x and y lists
+        ax.clear()
+        ax.plot(xs, ys)
+
+        #Format plot
+        plt.xticks(rotation=45, ha='right')
+        plt.subplots_adjust(bottom=0.3)
+        plt.title('Knee Angle Over Time')
+        plt.ylabel('Knee Angle (degrees)')
+
+def runAnimation():
+    global fig, ax, xs, ys
+    ani = animation.FuncAnimation(fig, animate, fargs=(xs, ys), interval=1000)
+    plt.show()
 
 if __name__ == "__main__":
-    main()
+    thread1 = threading.Thread(target=main)
+    thread1.daemon = True
+    thread1.start()
+    runAnimation()
