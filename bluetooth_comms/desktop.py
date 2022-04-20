@@ -7,6 +7,9 @@ import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 import threading
 import time
+import librosa
+from os.path import exists
+import math
 
 #Global variables
 l0_1 = None
@@ -22,12 +25,17 @@ from_server_d1 = None
 from_server_d2 = None
 normLen1 = 0
 normLen2 = 0
+bpmObtained = False
+bpm = -1
+
 
 #Set up graphing stuff
 fig = plt.figure()
 ax = fig.add_subplot(1,1,1)
 xs = []
 ys = []
+xstemp = []
+ystemp = []
 
 #Formula derived from own calculations, obtain the length
 def lengthVsVoltage(x):
@@ -178,16 +186,15 @@ def main():
         if not fullyCalibrate:
             print('Calibrate the sensors !')
         else:
-            print('--------------------')
+            #print('--------------------')
             normLen1 = normalLen(estLen_1, l0_1, l90_1)
-            print(normLen1)
+            #print(normLen1)
             #print(normalLen(estLen_2, l0_2, l90_2))
-            print('--------------------')
+            #print('--------------------')
 
 def animate(i, xs, ys):
     #Obtain knee sensor reading if calibrated
     global fullyCalibrate, normLen1
-    print("Trying to animate graph")
     if fullyCalibrate:
         angle = normLen1
 
@@ -196,12 +203,13 @@ def animate(i, xs, ys):
         ys.append(angle)
 
         #Limit it to 20 items
-        xs = xs[-20:]
-        ys = ys[-20:]
+        xstemp = xs[-20:]
+        ystemp = ys[-20:]
 
         #Draw x and y lists
         ax.clear()
-        ax.plot(xs, ys)
+        ax.plot(xstemp, ystemp)
+
 
         #Format plot
         plt.xticks(rotation=45, ha='right')
@@ -210,9 +218,31 @@ def animate(i, xs, ys):
         plt.ylabel('Knee Angle (degrees)')
 
 def runAnimation():
-    global fig, ax, xs, ys
-    ani = animation.FuncAnimation(fig, animate, fargs=(xs, ys), interval=1000)
-    plt.show()
+    global fig, ax, xs, ys, bpmObtained, bpm
+     #set up music
+    '''
+    Temporary...
+    path is the filepath to the song
+    soundFilePath just checks if the path exists
+    '''
+    if not bpmObtained:
+        path = "./music/playlists/90-100_bpm/Lynyrd Skynyrd - Sweet Home Alabama.wav"
+        soundFilePath = exists(path)
+        #print(soundFilePath)
+
+        if soundFilePath:
+            y, sr = librosa.load(path=path)
+            onset_env = librosa.onset.onset_strength(y=y,sr=sr)
+            tempo = librosa.beat.tempo(onset_envelope=onset_env, sr=sr)
+            print(tempo)
+
+            bpmObtained = True
+            timePeriod = 60000/tempo
+            runAnimation()
+    else:
+        
+        ani = animation.FuncAnimation(fig, animate, fargs=(xs, ys), interval=50)
+        plt.show()
 
 if __name__ == "__main__":
     thread1 = threading.Thread(target=main)
