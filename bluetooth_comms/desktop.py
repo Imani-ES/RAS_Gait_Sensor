@@ -9,7 +9,7 @@ import threading
 import time
 import librosa
 from os.path import exists
-import math
+from playsound import playsound
 
 #Global variables
 l0_1 = None
@@ -26,7 +26,9 @@ from_server_d2 = None
 normLen1 = 0
 normLen2 = 0
 bpmObtained = False
-bpm = -1
+timePeriod = -1
+timer = 0
+path = "./music/playlists/90-100_bpm/Lynyrd Skynyrd - Sweet Home Alabama.wav"
 
 
 #Set up graphing stuff
@@ -34,6 +36,7 @@ fig = plt.figure()
 ax = fig.add_subplot(1,1,1)
 xs = []
 ys = []
+plt.scatter(xs, ys)
 xstemp = []
 ystemp = []
 
@@ -194,39 +197,46 @@ def main():
 
 def animate(i, xs, ys):
     #Obtain knee sensor reading if calibrated
-    global fullyCalibrate, normLen1
+    global fullyCalibrate, normLen1, timer, timePeriod
+    #If the timer exceeds the timeperiod, reset the timer
+    if time.time() - timer > timePeriod:
+        timer = time.time()
+    
     if fullyCalibrate:
         angle = normLen1
 
         #Add knee data over realtime
-        xs.append(dt.datetime.now().strftime('%H:%M:%S.%f'))
+        xs.append(time.time() - timer)
         ys.append(angle)
 
-        #Limit it to 20 items
-        xstemp = xs[-20:]
-        ystemp = ys[-20:]
+        #Calculate the number of elements needed to plot, denominator is animation rate
+        num_elem = round(timePeriod[0]/0.025)
+
+        #Plot only elements in the current step
+        xstemp = xs[-num_elem:]
+        ystemp = ys[-num_elem:]
 
         #Draw x and y lists
         ax.clear()
         ax.plot(xstemp, ystemp)
-
 
         #Format plot
         plt.xticks(rotation=45, ha='right')
         plt.subplots_adjust(bottom=0.3)
         plt.title('Knee Angle Over Time')
         plt.ylabel('Knee Angle (degrees)')
+        plt.ylim([0,80])
 
 def runAnimation():
-    global fig, ax, xs, ys, bpmObtained, bpm
-     #set up music
+    global fig, ax, xs, ys, bpmObtained, timePeriod, timer, path
+
+    #set up music
     '''
     Temporary...
     path is the filepath to the song
     soundFilePath just checks if the path exists
     '''
     if not bpmObtained:
-        path = "./music/playlists/90-100_bpm/Lynyrd Skynyrd - Sweet Home Alabama.wav"
         soundFilePath = exists(path)
         #print(soundFilePath)
 
@@ -237,12 +247,27 @@ def runAnimation():
             print(tempo)
 
             bpmObtained = True
-            timePeriod = 60000/tempo
+
+            #Multiply by two for full step
+            timePeriod = 2*(60/tempo)
+            print(timePeriod)
             runAnimation()
     else:
-        
-        ani = animation.FuncAnimation(fig, animate, fargs=(xs, ys), interval=50)
-        plt.show()
+        while not fullyCalibrate:
+            continue
+        if fullyCalibrate:
+            #Play song
+            thread2 = threading.Thread(target=playSong)
+            thread2.daemon = True
+            thread2.start()
+
+            timer = time.time()
+            ani = animation.FuncAnimation(fig, animate, fargs=(xs, ys), interval=25)
+            plt.show()
+
+def playSong():
+    global path
+    playsound(path)
 
 if __name__ == "__main__":
     thread1 = threading.Thread(target=main)
