@@ -115,11 +115,24 @@ def testCalibrate(num_sensor):
         #Tell user sensor is calibrated
         print('Sensors are already calibrated!')
 
+#Function to set calibrated to false and reset sensors values
+def recalibrate():
+    global l0_1, l0_2, l90_1, l90_2, fullyCalibrate
+    fullyCalibrate = False
+    l0_1 = None
+    l0_2 = None
+    l90_1 = None
+    l90_2 = None
+
 #Sets up 'interupt' to calibrate using space key
 #keyboard.add_hotkey('space', calibrate)
 
 #Alternative calibrate for single sensor
 keyboard.add_hotkey('space', partial(testCalibrate, 1))
+
+#Set up 'interrupt' to recalibrate
+keyboard.add_hotkey('r', recalibrate)
+
 
 def main():
     global Pi_1_connected, Pi_2_connected, from_server_d1, from_server_d2, fullyCalibrate, normLen1, normLen2, blue_pi_1, blue_pi_2
@@ -218,7 +231,7 @@ def animate(i, xs, ys):
 
         #Draw x and y lists
         ax.clear()
-        ax.plot(xstemp, ystemp)
+        ax.scatter(xstemp, ystemp)
 
         #Format plot
         plt.xticks(rotation=45, ha='right')
@@ -226,6 +239,7 @@ def animate(i, xs, ys):
         plt.title('Knee Angle Over Time')
         plt.ylabel('Knee Angle (degrees)')
         plt.ylim([0,80])
+        plt.xlim([0, timePeriod])
 
 def runAnimation():
     global fig, ax, xs, ys, bpmObtained, timePeriod, timer, path
