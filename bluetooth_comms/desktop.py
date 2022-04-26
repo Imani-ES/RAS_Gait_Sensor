@@ -211,9 +211,15 @@ def main():
 def animate(i, xs, ys):
     #Obtain knee sensor reading if calibrated
     global fullyCalibrate, normLen1, timer, timePeriod
+    
     #If the timer exceeds the timeperiod, reset the timer
     if time.time() - timer > timePeriod:
         timer = time.time()
+        
+
+        #Draw x and y lists
+        ax.clear()
+        ax.scatter(xstemp, ystemp)
     
     if fullyCalibrate:
         angle = normLen1
@@ -228,10 +234,6 @@ def animate(i, xs, ys):
         #Plot only elements in the current step
         xstemp = xs[-num_elem:]
         ystemp = ys[-num_elem:]
-
-        #Draw x and y lists
-        ax.clear()
-        ax.scatter(xstemp, ystemp)
 
         #Format plot
         plt.xticks(rotation=45, ha='right')
@@ -270,7 +272,7 @@ def runAnimation():
         while not fullyCalibrate:
             continue
         if fullyCalibrate:
-            #Play song
+            #Play song in another thread to prevent blocking
             thread2 = threading.Thread(target=playSong)
             thread2.daemon = True
             thread2.start()
