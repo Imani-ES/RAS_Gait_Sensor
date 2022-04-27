@@ -128,7 +128,7 @@ def recalibrate():
 #keyboard.add_hotkey('space', calibrate)
 
 #Alternative calibrate for single sensor
-keyboard.add_hotkey('space', partial(testCalibrate, 1))
+keyboard.add_hotkey('space', partial(testCalibrate, 2))
 
 #Set up 'interrupt' to recalibrate
 keyboard.add_hotkey('r', recalibrate)
@@ -137,6 +137,7 @@ keyboard.add_hotkey('r', recalibrate)
 def main():
     global Pi_1_connected, Pi_2_connected, from_server_d1, from_server_d2, fullyCalibrate, normLen1, normLen2, blue_pi_1, blue_pi_2
     while 1:
+        '''
         #Check connection to Pi 1
         try:
             if not Pi_1_connected:
@@ -164,8 +165,8 @@ def main():
 
             #Convert the voltage to length
             estLen_1 = lengthVsVoltage(from_server_d1)
-
         '''
+
         #Check connection to Pi 2
         try:
             if not Pi_2_connected:
@@ -181,48 +182,41 @@ def main():
             time.sleep(5)
             continue
         else:
-            print("Pi 2 connected!")
+            #print("Pi 2 connected!")
             Pi_2_connected = True
 
             #Receive data from pi 2, decode the data
-            print("Trying to read from Pi 2...")
+            #print("Trying to read from Pi 2...")
             from_server_2 = blue_pi_2.recv(4096)
             from_server_d2 = from_server_2.decode()   
 
-            print("Data received! from 2")
+            #print("Data received! from 2")
 
             #Convert the voltage to length
             estLen_2 = lengthVsVoltage(from_server_d2)
-
         
-        #estLen_2 = lengthVsVoltage(float(from_server_d2))   
-        '''
 
         #Check if both sensors are calibrated
         if not fullyCalibrate:
             print('Calibrate the sensors !')
         else:
             #print('--------------------')
-            normLen1 = normalLen(estLen_1, l0_1, l90_1)
+            #normLen1 = normalLen(estLen_1, l0_1, l90_1)
+            normLen2 = normalLen(estLen_2, l0_2, l90_2)
             #print(normLen1)
             #print(normalLen(estLen_2, l0_2, l90_2))
             #print('--------------------')
 
 def animate(i, xs, ys):
     #Obtain knee sensor reading if calibrated
-    global fullyCalibrate, normLen1, timer, timePeriod
+    global fullyCalibrate, normLen1, normLen2, timer, timePeriod
     
     #If the timer exceeds the timeperiod, reset the timer
     if time.time() - timer > timePeriod:
         timer = time.time()
-        
-
-        #Draw x and y lists
-        ax.clear()
-        ax.scatter(xstemp, ystemp)
     
     if fullyCalibrate:
-        angle = normLen1
+        angle = normLen2
 
         #Add knee data over realtime
         xs.append(time.time() - timer)
@@ -234,6 +228,10 @@ def animate(i, xs, ys):
         #Plot only elements in the current step
         xstemp = xs[-num_elem:]
         ystemp = ys[-num_elem:]
+
+        #Draw x and y lists
+        ax.clear()
+        ax.scatter(xstemp, ystemp)
 
         #Format plot
         plt.xticks(rotation=45, ha='right')
