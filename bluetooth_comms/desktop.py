@@ -162,9 +162,11 @@ def main():
             from_server_d1 = from_server_1.decode()   
 
             #print("Data received!")
-
+            #Did you want to have a message processing thread so the listener doesnt stall?
             #Convert the voltage to length
             estLen_1 = lengthVsVoltage(from_server_d1)
+
+            #call update motion from gait_converter file
         '''
 
         #Check connection to Pi 2

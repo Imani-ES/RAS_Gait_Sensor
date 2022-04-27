@@ -9,29 +9,29 @@ def update_motion(angle, leg):
   global last_right, last_left, right_motion, leftmotion 
   
   if leg == "right":#check if right leg is changing direction
-    if angle > last_right: 
+    if angle > last_right: #Right leg extending
       if right_motion != 1:#update gate when knee changes movement
         find_gait()
       right_motion = 1
-    elif angle < last_right:
+    elif angle < last_right:#Right leg flexing
       if right_motion != -1:#update gate when knee changes movement
         find_gait()
       right_motion = -1
-    else:
+    else:#leg not moving
       right_motion = 0
     last_right = angle
     
   if leg == "left":#check if left leg is changing direction  
-    if angle > last_left: 
+    if angle > last_left: #left leg extending
       if left_motion != 1:#update gate when knee changes movement
         find_gait()
       left_motion = 1
-    elif angle < last_left:
+    elif angle < last_left:#left leg flexing
       if left_motion != -1:#update gate when knee changes movement
         find_gait()
       left_motion = -1
-    else:
-      lfet_motion = 0
+    else:#left leg static
+      left_motion = 0
     last_left = angle  
     
 def find_gait():
@@ -39,4 +39,5 @@ def find_gait():
   #find delta time by subtracting gait_track from current time 
   #send gait to front end
   #update gait track
+  
 
