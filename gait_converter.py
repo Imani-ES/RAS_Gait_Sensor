@@ -5,7 +5,7 @@ last_right, last_left = 0
 right_motion,leftmotion = 0
 l_gait_track, r_gait_track = 0
 
-def update_motion(angle, leg):
+def update_motion(angle, leg):#gets angle and leg from desktop bluetooth
   global last_right, last_left, right_motion, leftmotion 
   
   if leg == "right":#check if right leg is changing direction
@@ -39,5 +39,5 @@ def find_gait():
   #find delta time by subtracting gait_track from current time 
   #send gait to front end
   #update gait track
-  
+
 
