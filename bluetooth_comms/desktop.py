@@ -125,10 +125,10 @@ def recalibrate():
     l90_2 = None
 
 #Sets up 'interupt' to calibrate using space key
-#keyboard.add_hotkey('space', calibrate)
+keyboard.add_hotkey('space', calibrate)
 
 #Alternative calibrate for single sensor
-keyboard.add_hotkey('space', partial(testCalibrate, 2))
+#keyboard.add_hotkey('space', partial(testCalibrate, 2))
 
 #Set up 'interrupt' to recalibrate
 keyboard.add_hotkey('r', recalibrate)
@@ -136,8 +136,8 @@ keyboard.add_hotkey('r', recalibrate)
 
 def main():
     global Pi_1_connected, Pi_2_connected, from_server_d1, from_server_d2, fullyCalibrate, normLen1, normLen2, blue_pi_1, blue_pi_2
+    
     while 1:
-        '''
         #Check connection to Pi 1
         try:
             if not Pi_1_connected:
@@ -159,7 +159,7 @@ def main():
             #Receive data from pi 1, decode the data
             #print("Trying to read from Pi 1...")
             from_server_1 = blue_pi_1.recv(4096)
-            from_server_d1 = from_server_1.decode()   
+            from_server_d1 = from_server_1.decode()
 
             #print("Data received!")
             #Did you want to have a message processing thread so the listener doesnt stall?
@@ -167,7 +167,6 @@ def main():
             estLen_1 = lengthVsVoltage(from_server_d1)
 
             #call update motion from gait_converter file
-        '''
 
         #Check connection to Pi 2
         try:
@@ -196,17 +195,16 @@ def main():
 
             #Convert the voltage to length
             estLen_2 = lengthVsVoltage(from_server_d2)
-        
 
         #Check if both sensors are calibrated
         if not fullyCalibrate:
             print('Calibrate the sensors !')
         else:
             #print('--------------------')
-            #normLen1 = normalLen(estLen_1, l0_1, l90_1)
+            normLen1 = normalLen(estLen_1, l0_1, l90_1)
             normLen2 = normalLen(estLen_2, l0_2, l90_2)
-            #print(normLen1)
-            #print(normalLen(estLen_2, l0_2, l90_2))
+           
+            print(normLen2)
             #print('--------------------')
 
 def animate(i, xs, ys):
@@ -218,7 +216,7 @@ def animate(i, xs, ys):
         timer = time.time()
     
     if fullyCalibrate:
-        angle = normLen2
+        angle = normLen1
 
         #Add knee data over realtime
         xs.append(time.time() - timer)
