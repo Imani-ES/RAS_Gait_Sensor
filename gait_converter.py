@@ -1,43 +1,4 @@
 import threading
 import time
 
-last_right, last_left = 0
-right_motion,leftmotion = 0
-l_gait_track, r_gait_track = 0
-
-def update_motion(angle, leg):#gets angle and leg from desktop bluetooth
-  global last_right, last_left, right_motion, leftmotion 
-  
-  if leg == "right":#check if right leg is changing direction
-    if angle > last_right: #Right leg extending
-      if right_motion != 1:#update gate when knee changes movement
-        find_gait()
-      right_motion = 1
-    elif angle < last_right:#Right leg flexing
-      if right_motion != -1:#update gate when knee changes movement
-        find_gait()
-      right_motion = -1
-    else:#leg not moving
-      right_motion = 0
-    last_right = angle
-    
-  if leg == "left":#check if left leg is changing direction  
-    if angle > last_left: #left leg extending
-      if left_motion != 1:#update gate when knee changes movement
-        find_gait()
-      left_motion = 1
-    elif angle < last_left:#left leg flexing
-      if left_motion != -1:#update gate when knee changes movement
-        find_gait()
-      left_motion = -1
-    else:#left leg static
-      left_motion = 0
-    last_left = angle  
-    
-def find_gait():
-  global l_gait_track, r_gait_track
-  #find delta time by subtracting gait_track from current time 
-  #send gait to front end
-  #update gait track
-
-
+#functions for detecting cadence/gait
