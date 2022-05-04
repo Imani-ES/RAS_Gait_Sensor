@@ -14,7 +14,17 @@ Users can hear music that is equivalent to the BPM they want to walk to
 
 This code contains the components of the accompanying Music App that will be used with the Knee Sensor
 
-### Collaborators:
+## Getting Started
+
+### Bluetooth Communication
+- Power the Raspberry Pi, the bluetooth communcation script should run on start up
+- Navigate to /bluetooth_comms/
+- Run the desktop portion of the bluetooth communication with the command ``` python ./desktop.py ```
+- Press the space bar to calibrate the sensor at 0&deg; knee angle
+- Press the space bar again to calibrate at 90&deg; knee angle
+- You should now see the sensor data being recieved in your console
+
+## Collaborators:
 Imani Muhammad-Graham, Kexin Chen, Seongjae Shin, Andrew Talamo
 
 ## Resources

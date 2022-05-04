@@ -7,6 +7,9 @@ import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 import threading
 import time
+import librosa
+from os.path import exists
+from playsound import playsound
 
 #Global variables
 l0_1 = None
@@ -22,12 +25,20 @@ from_server_d1 = None
 from_server_d2 = None
 normLen1 = 0
 normLen2 = 0
+bpmObtained = False
+timePeriod = -1
+timer = 0
+path = "./music/playlists/90-100_bpm/Lynyrd Skynyrd - Sweet Home Alabama.wav"
+
 
 #Set up graphing stuff
 fig = plt.figure()
 ax = fig.add_subplot(1,1,1)
 xs = []
 ys = []
+plt.scatter(xs, ys)
+xstemp = []
+ystemp = []
 
 #Formula derived from own calculations, obtain the length
 def lengthVsVoltage(x):
@@ -104,14 +115,28 @@ def testCalibrate(num_sensor):
         #Tell user sensor is calibrated
         print('Sensors are already calibrated!')
 
+#Function to set calibrated to false and reset sensors values
+def recalibrate():
+    global l0_1, l0_2, l90_1, l90_2, fullyCalibrate
+    fullyCalibrate = False
+    l0_1 = None
+    l0_2 = None
+    l90_1 = None
+    l90_2 = None
+
 #Sets up 'interupt' to calibrate using space key
-#keyboard.add_hotkey('space', calibrate)
+keyboard.add_hotkey('space', calibrate)
 
 #Alternative calibrate for single sensor
-keyboard.add_hotkey('space', partial(testCalibrate, 1))
+#keyboard.add_hotkey('space', partial(testCalibrate, 2))
+
+#Set up 'interrupt' to recalibrate
+keyboard.add_hotkey('r', recalibrate)
+
 
 def main():
     global Pi_1_connected, Pi_2_connected, from_server_d1, from_server_d2, fullyCalibrate, normLen1, normLen2, blue_pi_1, blue_pi_2
+    
     while 1:
         #Check connection to Pi 1
         try:
@@ -134,14 +159,15 @@ def main():
             #Receive data from pi 1, decode the data
             #print("Trying to read from Pi 1...")
             from_server_1 = blue_pi_1.recv(4096)
-            from_server_d1 = from_server_1.decode()   
+            from_server_d1 = from_server_1.decode()
 
             #print("Data received!")
-
+            #Did you want to have a message processing thread so the listener doesnt stall?
             #Convert the voltage to length
             estLen_1 = lengthVsVoltage(from_server_d1)
 
-        '''
+            #call update motion from gait_converter file
+
         #Check connection to Pi 2
         try:
             if not Pi_2_connected:
@@ -157,62 +183,105 @@ def main():
             time.sleep(5)
             continue
         else:
-            print("Pi 2 connected!")
+            #print("Pi 2 connected!")
             Pi_2_connected = True
 
             #Receive data from pi 2, decode the data
-            print("Trying to read from Pi 2...")
+            #print("Trying to read from Pi 2...")
             from_server_2 = blue_pi_2.recv(4096)
             from_server_d2 = from_server_2.decode()   
 
-            print("Data received! from 2")
+            #print("Data received! from 2")
 
             #Convert the voltage to length
             estLen_2 = lengthVsVoltage(from_server_d2)
-
-        
-        #estLen_2 = lengthVsVoltage(float(from_server_d2))   
-        '''
 
         #Check if both sensors are calibrated
         if not fullyCalibrate:
             print('Calibrate the sensors !')
         else:
-            print('--------------------')
+            #print('--------------------')
             normLen1 = normalLen(estLen_1, l0_1, l90_1)
-            print(normLen1)
-            #print(normalLen(estLen_2, l0_2, l90_2))
-            print('--------------------')
+            normLen2 = normalLen(estLen_2, l0_2, l90_2)
+           
+            print(normLen2)
+            #print('--------------------')
 
 def animate(i, xs, ys):
     #Obtain knee sensor reading if calibrated
-    global fullyCalibrate, normLen1
-    print("Trying to animate graph")
+    global fullyCalibrate, normLen1, normLen2, timer, timePeriod
+    
+    #If the timer exceeds the timeperiod, reset the timer
+    if time.time() - timer > timePeriod:
+        timer = time.time()
+    
     if fullyCalibrate:
         angle = normLen1
 
         #Add knee data over realtime
-        xs.append(dt.datetime.now().strftime('%H:%M:%S.%f'))
+        xs.append(time.time() - timer)
         ys.append(angle)
 
-        #Limit it to 20 items
-        xs = xs[-20:]
-        ys = ys[-20:]
+        #Calculate the number of elements needed to plot, denominator is animation rate
+        num_elem = round(timePeriod[0]/0.025)
+
+        #Plot only elements in the current step
+        xstemp = xs[-num_elem:]
+        ystemp = ys[-num_elem:]
 
         #Draw x and y lists
         ax.clear()
-        ax.plot(xs, ys)
+        ax.scatter(xstemp, ystemp)
 
         #Format plot
         plt.xticks(rotation=45, ha='right')
         plt.subplots_adjust(bottom=0.3)
         plt.title('Knee Angle Over Time')
         plt.ylabel('Knee Angle (degrees)')
+        plt.ylim([0,80])
+        plt.xlim([0, timePeriod])
 
 def runAnimation():
-    global fig, ax, xs, ys
-    ani = animation.FuncAnimation(fig, animate, fargs=(xs, ys), interval=1000)
-    plt.show()
+    global fig, ax, xs, ys, bpmObtained, timePeriod, timer, path
+
+    #set up music
+    '''
+    Temporary...
+    path is the filepath to the song
+    soundFilePath just checks if the path exists
+    '''
+    if not bpmObtained:
+        soundFilePath = exists(path)
+        #print(soundFilePath)
+
+        if soundFilePath:
+            y, sr = librosa.load(path=path)
+            onset_env = librosa.onset.onset_strength(y=y,sr=sr)
+            tempo = librosa.beat.tempo(onset_envelope=onset_env, sr=sr)
+            print(tempo)
+
+            bpmObtained = True
+
+            #Multiply by two for full step
+            timePeriod = 2*(60/tempo)
+            print(timePeriod)
+            runAnimation()
+    else:
+        while not fullyCalibrate:
+            continue
+        if fullyCalibrate:
+            #Play song in another thread to prevent blocking
+            thread2 = threading.Thread(target=playSong)
+            thread2.daemon = True
+            thread2.start()
+
+            timer = time.time()
+            ani = animation.FuncAnimation(fig, animate, fargs=(xs, ys), interval=25)
+            plt.show()
+
+def playSong():
+    global path
+    playsound(path)
 
 if __name__ == "__main__":
     thread1 = threading.Thread(target=main)
