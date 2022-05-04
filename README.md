@@ -24,7 +24,7 @@ This code contains the components of the accompanying Music App that will be use
 - Press the space bar again to calibrate at 90&deg; knee angle
 - You should now see the sensor data being recieved in your console
 
-### Collaborators:
+## Collaborators:
 Imani Muhammad-Graham, Kexin Chen, Seongjae Shin, Andrew Talamo
 
 ## Resources
