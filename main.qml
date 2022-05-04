@@ -10,12 +10,14 @@ ApplicationWindow {
     height: 720
     visible: true
 
+    property var starting: 0
+
     header: TabBar {
         TabButton {
           implicitHeight: 70
           font.pixelSize: 30
           text: "Home"
-          onClicked: stackView.replace(page1)
+          onClicked: starting ? stackView.replace(page1_2) : stackView.replace(page1)
         }
         TabButton {
           implicitHeight: 70
@@ -23,31 +25,36 @@ ApplicationWindow {
           text: "About"
           onClicked: stackView.replace(page2)
         }
+        /*
         TabButton {
           implicitHeight: 70
           font.pixelSize: 30
           text: "Connect"
           onClicked: stackView.replace(page3)
         }
+        */
         TabButton {
           implicitHeight: 70
           font.pixelSize: 30
           text: "View"
           onClicked: stackView.replace(page4)
         }
+        /*
         TabButton {
           implicitHeight: 70
           font.pixelSize: 30
           text: "Audio"
           onClicked: stackView.replace(page5)
         }
+        */
+        /*
         TabButton {
           implicitHeight: 70
           font.pixelSize: 30
           text: "Settings"
           onClicked: stackView.replace(page6)
         }
-
+        */
     }
     
     Component {
@@ -133,6 +140,7 @@ ApplicationWindow {
             onExited: { button_round.state=''}
             onClicked: {
               button_round.clicked();
+              starting = 1
               stackView.replace(page1_2)
             }
             onPressed: { button_round.state="Pressed" }
@@ -161,12 +169,101 @@ ApplicationWindow {
       id: page2
       Page {
         Label {
-          text: qsTr("Second page")
           anchors.centerIn: parent
+        }
+        Text {
+            text: "How to Use"
+            font.pointSize: 40
+            anchors {
+                top: parent.top
+                topMargin: 25
+                left: parent.left
+                leftMargin: 30
+            }
+        }
+        Text {
+            text: "1. Band a strap with main component above the knee"
+            font.pointSize: 20
+            anchors {
+                top: parent.top
+                topMargin: 100
+                left: parent.left
+                leftMargin: 30
+            }
+        }
+        Text {
+            text: "2. Band an another strap below the knee"
+            font.pointSize: 20
+            anchors {
+                top: parent.top
+                topMargin: 140
+                left: parent.left
+                leftMargin: 30
+            }
+        }
+        Text {
+            text: "3. Make sure it is tied tightly"
+            font.pointSize: 20
+            anchors {
+                top: parent.top
+                topMargin: 180
+                left: parent.left
+                leftMargin: 30
+            }
+        }
+        Text {
+            text: "4. Open the App"
+            font.pointSize: 20
+            anchors {
+                top: parent.top
+                topMargin: 220
+                left: parent.left
+                leftMargin: 30
+            }
+        }
+        Text {
+            text: "5. Click start button"
+            font.pointSize: 20
+            anchors {
+                top: parent.top
+                topMargin: 260
+                left: parent.left
+                leftMargin: 30
+            }
+        }
+        Text {
+            text: "6. Straighten out both legs, then press space bar"
+            font.pointSize: 20
+            anchors {
+                top: parent.top
+                topMargin: 300
+                left: parent.left
+                leftMargin: 30
+            }
+        }
+        Text {
+            text: "7. Fold both legs until 90°, then press space bar"
+            font.pointSize: 20
+            anchors {
+                top: parent.top
+                topMargin: 340
+                left: parent.left
+                leftMargin: 30
+            }
+        }
+        Text {
+            text: "8. Walk around with your preferred gait speed"
+            font.pointSize: 20
+            anchors {
+                top: parent.top
+                topMargin: 380
+                left: parent.left
+                leftMargin: 30
+            }
         }
       }
     }
-
+/*
     Component {
       id: page3
       Page {
@@ -234,7 +331,7 @@ ApplicationWindow {
         }
       }
     }
-
+*/
     Component {
       id: page4
       Page {
@@ -479,7 +576,7 @@ ApplicationWindow {
         }
       }
     }
-
+/*
     Component {
       id: page5
       Page {
@@ -557,7 +654,8 @@ ApplicationWindow {
       }
     }
 
-
+*/
+/*
     Component {
       id: page6
       Page {
@@ -567,7 +665,7 @@ ApplicationWindow {
         }
       }
     }
-
+*/
 
 
     StackView {
