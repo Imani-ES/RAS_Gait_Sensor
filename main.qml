@@ -14,6 +14,7 @@ ApplicationWindow {
 
     header: TabBar {
         TabButton {
+          id: home
           implicitHeight: 70
           font.pixelSize: 30
           text: "Home"
@@ -159,8 +160,97 @@ ApplicationWindow {
       id: page1_2
       Page {
         Label {
-          text: qsTr("Calibration page")
           anchors.centerIn: parent
+        }
+        // calibrate at 0
+        Rectangle {
+          anchors {
+            top: parent.top
+            topMargin: 150
+            left: parent.left
+            leftMargin: 340
+          }
+          Text {
+             anchors {
+              top: parent.top
+              topMargin: 25
+              left: parent.left
+              leftMargin: 30
+            }
+            text: "Calibrating at 0"
+            font.pointSize: 20
+          }
+          width: 400
+          height: 80
+          color: "#E0E0E0"
+        }
+        Rectangle {
+          anchors {
+            top: parent.top
+            topMargin: 165
+            left: parent.left
+            leftMargin: 675
+          }
+          width: 50
+          height: width
+          color: "red"
+          radius: width*0.5
+        }
+        // calibrate at 90
+        Rectangle {
+          anchors {
+            top: parent.top
+            topMargin: 250
+            left: parent.left
+            leftMargin: 340
+          }
+          Text {
+             anchors {
+              top: parent.top
+              topMargin: 25
+              left: parent.left
+              leftMargin: 30
+            }
+            text: "Calibrating at 90"
+            font.pointSize: 20
+          }
+          width: 400
+          height: 80
+          color: "#E0E0E0"
+        }
+        Rectangle {
+          anchors {
+            top: parent.top
+            topMargin: 265
+            left: parent.left
+            leftMargin: 675
+          }
+          width: 50
+          height: width
+          color: "red"
+          radius: width*0.5
+        }
+        // running
+        Rectangle {
+          anchors {
+            top: parent.top
+            topMargin: 350
+            left: parent.left
+            leftMargin: 340
+          }
+          Text {
+             anchors {
+              top: parent.top
+              topMargin: 25
+              left: parent.left
+              leftMargin: 30
+            }
+            text: "Running..."
+            font.pointSize: 20
+          }
+          width: 400
+          height: 80
+          color: "#E0E0E0"
         }
       }
     }
@@ -565,7 +655,10 @@ ApplicationWindow {
             onEntered: { button_2.state='Hovering'}
             onExited: { button_2.state=''}
             onClicked: { button_2.clicked();}
-            onPressed: { button_2.state="Pressed" }
+            onPressed: {
+                button_2.state="Pressed"
+                home.clicked();
+            }
             onReleased: {
               if (containsMouse)
                 button_2.state="Hovering";
