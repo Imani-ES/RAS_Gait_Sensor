@@ -36,9 +36,16 @@ fig = plt.figure()
 ax = fig.add_subplot(1,1,1)
 xs = []
 ys = []
-plt.scatter(xs, ys)
 xstemp = []
 ystemp = []
+
+fig2 = plt.figure()
+ax2 = fig2.add_subplot(1,1,1)
+xs2 = []
+ys2 = []
+xs2temp = []
+ys2temp = []
+
 
 #Formula derived from own calculations, obtain the length
 def lengthVsVoltage(x):
@@ -204,12 +211,47 @@ def main():
             normLen1 = normalLen(estLen_1, l0_1, l90_1)
             normLen2 = normalLen(estLen_2, l0_2, l90_2)
            
+            print(normLen1)
             print(normLen2)
             #print('--------------------')
 
 def animate(i, xs, ys):
     #Obtain knee sensor reading if calibrated
-    global fullyCalibrate, normLen1, normLen2, timer, timePeriod
+    global fullyCalibrate, normLen1, timer, timePeriod
+    
+    #If the timer exceeds the timeperiod, reset the timer
+    if time.time() - timer > timePeriod:
+        timer = time.time()
+    
+    if fullyCalibrate:
+        angle = normLen1
+
+        #Add knee data over realtime
+        xs.append(time.time() - timer)
+        ys.append(angle)
+
+        #Calculate the number of elements needed to plot, denominator is animation rate
+        num_elem = round(timePeriod[0]/0.025)
+
+        #Plot only elements in the current step
+        xstemp = xs[-num_elem:]
+        ystemp = ys[-num_elem:]
+
+        #Draw x and y lists
+        ax.clear()
+        ax.scatter(xstemp, ystemp)
+
+        #Format plot
+        plt.xticks(rotation=45, ha='right')
+        plt.subplots_adjust(bottom=0.3)
+        plt.title('Knee Angle Over Time')
+        plt.ylabel('Knee Angle (degrees)')
+        plt.ylim([0,80])
+        plt.xlim([0, timePeriod])
+
+def animate2(i, xs, ys):
+    #Obtain knee sensor reading if calibrated
+    global fullyCalibrate, normLen1, timer, timePeriod
     
     #If the timer exceeds the timeperiod, reset the timer
     if time.time() - timer > timePeriod:
