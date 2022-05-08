@@ -10,8 +10,11 @@ ApplicationWindow {
     height: 720
     visible: true
 
+    // indicator for program starting
     property var starting: 0
 
+    // 6 base pages
+    // but we use only 3 pages - home, about, view
     header: TabBar {
         TabButton {
           id: home
@@ -57,7 +60,9 @@ ApplicationWindow {
         }
         */
     }
-    
+
+    /* home page
+       only have start button for stating app*/
     Component {
       id: page1
       Page {
@@ -156,6 +161,9 @@ ApplicationWindow {
       }
     }
 
+    /* calibration page
+       When user presses 'space bar', it shows whether calibrating is succeesful or not
+       by colored circle*/
     Component {
       id: page1_2
       Page {
@@ -255,6 +263,8 @@ ApplicationWindow {
       }
     }
 
+    /* About page
+       This page says how to use this app to user */
     Component {
       id: page2
       Page {
@@ -353,6 +363,9 @@ ApplicationWindow {
         }
       }
     }
+
+    /* Connect page
+       This page turns on and off bluetooth and shows available devices */
 /*
     Component {
       id: page3
@@ -422,6 +435,9 @@ ApplicationWindow {
       }
     }
 */
+
+    /* view page
+       This page shows current angles and tempo. And, user can stop and recalibrate */
     Component {
       id: page4
       Page {
@@ -481,6 +497,7 @@ ApplicationWindow {
           radius: 10
         }
 
+        // Stop button
         Item {
           id: button_1
           width: 170
@@ -573,6 +590,7 @@ ApplicationWindow {
           }
         }
 
+        // Start button
         Item {
           id: button_2
           width: 170
@@ -669,6 +687,10 @@ ApplicationWindow {
         }
       }
     }
+
+    /* audio page
+       This page shows the list of songs and cover image
+       User can choose the songs and adjust the volumes */
 /*
     Component {
       id: page5
@@ -760,7 +782,7 @@ ApplicationWindow {
     }
 */
 
-
+    /* adjust animation of stackview and showing page by stack */
     StackView {
         id: stackView
         anchors.fill: parent
