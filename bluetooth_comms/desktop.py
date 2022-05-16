@@ -10,6 +10,7 @@ import time
 import librosa
 from os.path import exists
 from playsound import playsound
+import sys
 
 #Global variables
 l0_1 = None
@@ -26,19 +27,34 @@ normLen2 = 0
 bpmObtained = False
 timePeriod = -1
 timer = 0
-path = "../music/playlists/90-100_bpm/Lynyrd Skynyrd - Sweet Home Alabama.wav"
+timer2 = 0
+path = "music/playlists/90-100_bpm/Lynyrd Skynyrd - Sweet Home Alabama.wav"
 
 
-#Set up graphing stuff
+
+#Set up graphing stuff, xs(2) and ys(2) should be able to export to csv
 fig = plt.figure()
-ax = fig.add_subplot(1,1,1)
+ax = fig.add_subplot(111)
+ax1 = fig.add_subplot(211)
+ax2 = fig.add_subplot(212)
+
+ax.spines['top'].set_color('none')
+ax.spines['bottom'].set_color('none')
+ax.spines['left'].set_color('none')
+ax.spines['right'].set_color('none')
+ax.tick_params(labelcolor='w', top=False, bottom=False, left=False, right=False)
+
+ax.set_xlabel('Time Period (sesconds)')
+ax.set_ylabel('Knee Angle (degrees)')
+
+ax1.set_title('Left Knee Angle')
+ax2.set_title('Right Knee Angle')
+
 xs = []
 ys = []
 xstemp = []
 ystemp = []
 
-fig2 = plt.figure()
-ax2 = fig2.add_subplot(1,1,1)
 xs2 = []
 ys2 = []
 xs2temp = []
@@ -216,7 +232,7 @@ def main():
 
 def animate(i, xs, ys):
     #Obtain knee sensor reading if calibrated
-    global fullyCalibrate, normLen1, timer, timePeriod
+    global fullyCalibrate, normLen1, normLen2, timer, timePeriod, ax1, ax2
     
     #If the timer exceeds the timeperiod, reset the timer
     if time.time() - timer > timePeriod:
@@ -224,77 +240,50 @@ def animate(i, xs, ys):
     
     if fullyCalibrate:
         angle = normLen1
+        angle2 = normLen2
 
         #Add knee data over realtime
         xs.append(time.time() - timer)
         ys.append(angle)
 
-        #Calculate the number of elements needed to plot, denominator is animation rate
-        num_elem = round(timePeriod[0]/0.025)
-
-        #Plot only elements in the current step
-        xstemp = xs[-num_elem:]
-        ystemp = ys[-num_elem:]
-
-        #Draw x and y lists
-        ax.clear()
-        ax.scatter(xstemp, ystemp)
-
-        #Format plot
-        plt.xticks(rotation=45, ha='right')
-        plt.subplots_adjust(bottom=0.3)
-        plt.title('Knee Angle Over Time')
-        plt.ylabel('Knee Angle (degrees)')
-        plt.ylim([0,80])
-        plt.xlim([0, timePeriod])
-
-def animate2(i, xs, ys):
-    #Obtain knee sensor reading if calibrated
-    global fullyCalibrate, normLen1, timer, timePeriod
-    
-    #If the timer exceeds the timeperiod, reset the timer
-    if time.time() - timer > timePeriod:
-        timer = time.time()
-    
-    if fullyCalibrate:
-        angle = normLen1
-
-        #Add knee data over realtime
-        xs.append(time.time() - timer)
-        ys.append(angle)
+        xs2.append(time.time() - timer)
+        ys2.append(angle2)
 
         #Calculate the number of elements needed to plot, denominator is animation rate
         num_elem = round(timePeriod[0]/0.025)
 
-        #Plot only elements in the current step
+        #Plot only elements in the current step (not really accurate)
         xstemp = xs[-num_elem:]
         ystemp = ys[-num_elem:]
 
-        #Draw x and y lists
-        ax.clear()
-        ax.scatter(xstemp, ystemp)
+        xs2temp = xs2[-num_elem:]
+        ys2temp = ys2[-num_elem:]
 
-        #Format plot
-        plt.xticks(rotation=45, ha='right')
-        plt.subplots_adjust(bottom=0.3)
-        plt.title('Knee Angle Over Time')
-        plt.ylabel('Knee Angle (degrees)')
-        plt.ylim([0,80])
-        plt.xlim([0, timePeriod])
+        #Draw x and y lists
+
+        ax1.clear()
+        ax1.scatter(xstemp, ystemp)
+
+        ax2.clear()
+        ax2.scatter(xs2temp, ys2temp)
+
+        #Set x and y axis limit
+        ax1.set_ylim([0, 90])
+        ax1.set_xlim([0, timePeriod])
+
+        ax2.set_ylim([0, 90])
+        ax2.set_xlim([0, timePeriod])
 
 def runAnimation():
-    global fig, ax, xs, ys, bpmObtained, timePeriod, timer, path
+    global fig, ax1, ax2, xs, ys, xs2, ys2, bpmObtained, timePeriod, timer, path, fullyCalibrate
 
-    #set up music
-    '''
-    Temporary...
-    path is the filepath to the song
-    soundFilePath just checks if the path exists
-    '''
+    #Check if the song's bpm was already obtained
     if not bpmObtained:
+        #Check if song path exists
         soundFilePath = exists(path)
         print(soundFilePath)
         if soundFilePath:
+            #BPM Calculation, not the most accurate, sometimes may use double the bpm
             y, sr = librosa.load(path=path)
             onset_env = librosa.onset.onset_strength(y=y,sr=sr)
             tempo = librosa.beat.tempo(onset_envelope=onset_env, sr=sr)
@@ -305,10 +294,17 @@ def runAnimation():
             #Multiply by two for full step
             timePeriod = 2*(60/tempo)
             print(timePeriod)
+
+            #Call the function again to run the animation part
             runAnimation()
         else:
-            print("File not found!")
+            #Exit program if song doesn't exist
+            print("Song path does not exist!")
+            sys.exit()
     else:
+        #Debug to set calibrate to true
+        #fullyCalibrate = True
+        #Wait until sensors are calibrated
         while not fullyCalibrate:
             continue
         if fullyCalibrate:
@@ -318,7 +314,8 @@ def runAnimation():
             thread2.start()
 
             timer = time.time()
-            ani = animation.FuncAnimation(fig, animate, fargs=(xs, ys), interval=25)
+            ani = animation.FuncAnimation(fig, animate, fargs=(xs, ys), interval=10)
+            fig.tight_layout()
             plt.show()
 
 def playSong():
