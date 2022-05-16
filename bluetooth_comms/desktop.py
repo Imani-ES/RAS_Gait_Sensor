@@ -19,8 +19,6 @@ l90_2 = None
 fullyCalibrate = False
 Pi_1_connected = False
 Pi_2_connected = False
-blue_pi_1 = None
-blue_pi_2 = None
 from_server_d1 = None
 from_server_d2 = None
 normLen1 = 0
@@ -28,7 +26,7 @@ normLen2 = 0
 bpmObtained = False
 timePeriod = -1
 timer = 0
-path = "./music/playlists/90-100_bpm/Lynyrd Skynyrd - Sweet Home Alabama.wav"
+path = "../music/playlists/90-100_bpm/Lynyrd Skynyrd - Sweet Home Alabama.wav"
 
 
 #Set up graphing stuff
@@ -150,6 +148,7 @@ def main():
             if not Pi_1_connected:
                 print("Trying to connect to Pi 1")
                 blue_pi_1.connect((pi_1_addr, port))
+                print("test")
             else:
                 blue_pi_1.sendall("1".encode())
         except socket.error:
@@ -294,8 +293,7 @@ def runAnimation():
     '''
     if not bpmObtained:
         soundFilePath = exists(path)
-        #print(soundFilePath)
-
+        print(soundFilePath)
         if soundFilePath:
             y, sr = librosa.load(path=path)
             onset_env = librosa.onset.onset_strength(y=y,sr=sr)
@@ -308,6 +306,8 @@ def runAnimation():
             timePeriod = 2*(60/tempo)
             print(timePeriod)
             runAnimation()
+        else:
+            print("File not found!")
     else:
         while not fullyCalibrate:
             continue
