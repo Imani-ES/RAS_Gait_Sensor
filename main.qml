@@ -3,6 +3,7 @@ import QtQuick.Controls 2.15
 import QtQuick.Controls.Styles 1.4
 import QtQuick.Window 2.2
 import Qt.labs.folderlistmodel 2.15
+import Signal 1.0
 
 ApplicationWindow {
     id: window
@@ -10,8 +11,13 @@ ApplicationWindow {
     height: 720
     visible: true
 
+    Calibration {
+      id: calibration
+    }
+
     // indicator for program starting
-    property var starting: 0
+    property int starting: 0
+    property int ninetyturn: 0
 
     // 6 base pages
     // but we use only 3 pages - home, about, view
@@ -98,7 +104,6 @@ ApplicationWindow {
             id: rectanglebutton_round
             anchors.fill: parent
             color: button_round.enabled ? "#33FF33" : "#006600"
-
             Text {
                 id: innerText
                 text: "Start"
@@ -148,6 +153,7 @@ ApplicationWindow {
               button_round.clicked();
               starting = 1
               stackView.replace(page1_2)
+              //calibration.cmdline("python ./bluetooth_comms/desktop.py")
             }
             onPressed: { button_round.state="Pressed" }
             onReleased: {
@@ -170,6 +176,7 @@ ApplicationWindow {
         Label {
           anchors.centerIn: parent
         }
+        focus: true
         // calibrate at 0
         Rectangle {
           anchors {
@@ -193,6 +200,7 @@ ApplicationWindow {
           color: "#E0E0E0"
         }
         Rectangle {
+          id: zerorec
           anchors {
             top: parent.top
             topMargin: 165
@@ -227,6 +235,7 @@ ApplicationWindow {
           color: "#E0E0E0"
         }
         Rectangle {
+          id: ninetyrec
           anchors {
             top: parent.top
             topMargin: 265
@@ -259,6 +268,31 @@ ApplicationWindow {
           width: 400
           height: 80
           color: "#E0E0E0"
+        }
+        // key event for indicator of calibration of each degree
+        Item {
+          focus: true
+          Keys.onPressed: {
+            if (event.key == Qt.Key_Space && ninetyturn == 0)
+            {
+              console.log("calibrating 0 degree")
+              zerorec.color = 'green'
+              ninetyturn = 1;
+              event.accepted = true;
+            }
+            else if (event.key == Qt.Key_Space && ninetyturn == 1){
+              console.log("calibrating 90 degree")
+              ninetyrec.color = 'green'
+              event.accepted = true;
+            }
+            else if (event.key == Qt.Key_R){
+              console.log("recablirate")
+              zerorec.color = 'red'
+              ninetyrec.color = 'red'
+              ninetyturn = 0;
+              event.accepted = true;
+            }
+          }
         }
       }
     }
@@ -531,7 +565,7 @@ ApplicationWindow {
           Rectangle {
             id: rectangleButton_1
             anchors.fill: parent
-            radius: borderRadius
+            radius: 2
             color: button_1.enabled ? "#FF3333" : "#660000"
 
             Text {
@@ -624,7 +658,7 @@ ApplicationWindow {
           Rectangle {
             id: rectangleButton_2
             anchors.fill: parent
-            radius: borderRadius
+            radius: 2
             color: button_2.enabled ? "#33FF33" : "#006600"
 
             Text {
@@ -785,6 +819,7 @@ ApplicationWindow {
     /* adjust animation of stackview and showing page by stack */
     StackView {
         id: stackView
+        focus: true
         anchors.fill: parent
         replaceEnter: Transition {
             NumberAnimation { property: "opacity"; to: 1.0; duration: 1 }

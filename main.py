@@ -1,20 +1,22 @@
 import sys
+import os
 from os.path import exists
 import wave
 
 from PyQt5.QtGui import QGuiApplication
-from PyQt5.QtQml import QQmlApplicationEngine
-from PyQt5.QtMultimedia import QAudioOutput, QAudio, QAudioFormat, QAudioDeviceInfo
-from PyQt5.QtCore import QFile, QIODevice
-
+from PyQt5.QtQml import QQmlApplicationEngine, qmlRegisterType
+from PyQt5.QtMultimedia import QAudioOutput, QAudioFormat, QAudioDeviceInfo
+from PyQt5.QtCore import QFile, QIODevice, QObject, pyqtProperty
 
 def startApp():
     app = QGuiApplication(sys.argv)
 
+    qmlRegisterType(Calibration, 'Signal', 1, 0, 'Calibration')
+
     engine = QQmlApplicationEngine()
     engine.quit.connect(app.quit)
     engine.load('./main.qml')
-    
+
     #set up music
     '''
     Temporary...
@@ -28,7 +30,7 @@ def startApp():
     if soundFilePath:
         #Create the file to be read
         soundFile = QFile()
-        soundFile.setFileName(path)
+        soundFile.setFilecmdline(path)
         soundFile.open(QIODevice.ReadOnly)
 
         #Obtain the sample rate, sample width, and channel count
@@ -39,7 +41,7 @@ def startApp():
             sampleRate = wav_file.getframerate()
             sampleWidth = wav_file.getsampwidth()*8
             channelCount = wav_file.getnchannels()
-        
+
         '''
         Song debug commands
         print("Sample Rate: ", sampleRate)
@@ -64,9 +66,21 @@ def startApp():
         #Output the audio and play it
         output = QAudioOutput(format)
         output.start(soundFile)
-        
+
 
     sys.exit(app.exec())
+
+class Calibration(QObject):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+
+        # Initialise the value of the properties.
+        self._cmdline = ''
+
+    # Define the setter of the 'name' property.
+    @pyqtProperty('QString')
+    def cmdline(cmdline):
+        os.system("python ./bluetooth_comms/desktop.py")
 
 if __name__ == "__main__":
     startApp()
