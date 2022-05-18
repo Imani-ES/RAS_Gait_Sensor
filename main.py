@@ -17,12 +17,13 @@ def startApp():
     engine.quit.connect(app.quit)
     engine.load('./main.qml')
 
-    #set up music
     '''
+    #set up music
+    
     Temporary...
     path is the filepath to the song
     soundFilePath just checks if the path exists
-    '''
+    
     path = "./music/playlists/105-110_bpm/Pirates of the Caribbean Theme.wav"
     soundFilePath = exists(path)
     #print(soundFilePath)
@@ -42,12 +43,12 @@ def startApp():
             sampleWidth = wav_file.getsampwidth()*8
             channelCount = wav_file.getnchannels()
 
-        '''
+        
         Song debug commands
         print("Sample Rate: ", sampleRate)
         print("Sample Size: ", sampleWidth)
         print("Channel Count: ", channelCount)
-        '''
+        
 
         #Create the settings to playback the audio
         format = QAudioFormat()
@@ -68,6 +69,7 @@ def startApp():
         output.start(soundFile)
 
 
+    '''
     sys.exit(app.exec())
 
 class Calibration(QObject):
@@ -84,3 +86,4 @@ class Calibration(QObject):
 
 if __name__ == "__main__":
     startApp()
+  
