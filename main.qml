@@ -319,7 +319,7 @@ ApplicationWindow {
             }
         }
         Text {
-            text: "1. Band a strap with main component above the knee"
+            text: "1. Band an upper strap on the middle of thigh"
             font.pointSize: 20
             anchors {
                 top: parent.top
@@ -329,7 +329,7 @@ ApplicationWindow {
             }
         }
         Text {
-            text: "2. Band an another strap below the knee"
+            text: "2. Band a middle strap with main component above the knee"
             font.pointSize: 20
             anchors {
                 top: parent.top
@@ -339,7 +339,7 @@ ApplicationWindow {
             }
         }
         Text {
-            text: "3. Make sure it is tied tightly"
+            text: "3. Band a lower strap below the knee"
             font.pointSize: 20
             anchors {
                 top: parent.top
@@ -349,7 +349,7 @@ ApplicationWindow {
             }
         }
         Text {
-            text: "4. Open the App"
+            text: "4. Make sure it is tied tightly"
             font.pointSize: 20
             anchors {
                 top: parent.top
@@ -359,7 +359,7 @@ ApplicationWindow {
             }
         }
         Text {
-            text: "5. Click start button"
+            text: "5. Open the App"
             font.pointSize: 20
             anchors {
                 top: parent.top
@@ -369,7 +369,7 @@ ApplicationWindow {
             }
         }
         Text {
-            text: "6. Straighten out both legs, then press space bar"
+            text: "6. Click start button"
             font.pointSize: 20
             anchors {
                 top: parent.top
@@ -379,7 +379,7 @@ ApplicationWindow {
             }
         }
         Text {
-            text: "7. Fold both legs until 90°, then press space bar"
+            text: "7. Straighten out both legs, then press space bar"
             font.pointSize: 20
             anchors {
                 top: parent.top
@@ -389,11 +389,21 @@ ApplicationWindow {
             }
         }
         Text {
-            text: "8. Walk around with your preferred gait speed"
+            text: "8. Fold both legs until 90°, then press space bar"
             font.pointSize: 20
             anchors {
                 top: parent.top
                 topMargin: 380
+                left: parent.left
+                leftMargin: 30
+            }
+        }
+        Text {
+            text: "9. Walk around with your preferred gait speed"
+            font.pointSize: 20
+            anchors {
+                top: parent.top
+                topMargin: 420
                 left: parent.left
                 leftMargin: 30
             }

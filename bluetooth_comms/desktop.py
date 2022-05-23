@@ -1,4 +1,5 @@
 import socket
+from turtle import update
 import keyboard
 import time
 from functools import partial
@@ -11,6 +12,8 @@ import librosa
 from os.path import exists
 from playsound import playsound
 import sys
+from tkinter import *
+
 
 #Global variables
 l0_1 = None
@@ -33,7 +36,7 @@ path = "music/playlists/90-100_bpm/Lynyrd Skynyrd - Sweet Home Alabama.wav"
 
 
 #Set up graphing stuff, xs(2) and ys(2) should be able to export to csv
-fig = plt.figure()
+fig = plt.figure(figsize=(10,8))
 ax = fig.add_subplot(111)
 ax1 = fig.add_subplot(211)
 ax2 = fig.add_subplot(212)
@@ -164,7 +167,7 @@ def main():
             if not Pi_1_connected:
                 print("Trying to connect to Pi 1")
                 blue_pi_1.connect((pi_1_addr, port))
-                print("test")
+                #print("test")
             else:
                 blue_pi_1.sendall("1".encode())
         except socket.error:
@@ -226,8 +229,8 @@ def main():
             normLen1 = normalLen(estLen_1, l0_1, l90_1)
             normLen2 = normalLen(estLen_2, l0_2, l90_2)
            
-            print(normLen1)
-            print(normLen2)
+            #print(normLen1)
+            #print(normLen2)
             #print('--------------------')
 
 def animate(i, xs, ys):
@@ -281,7 +284,7 @@ def runAnimation():
     if not bpmObtained:
         #Check if song path exists
         soundFilePath = exists(path)
-        print(soundFilePath)
+        #print(soundFilePath)
         if soundFilePath:
             #BPM Calculation, not the most accurate, sometimes may use double the bpm
             y, sr = librosa.load(path=path)
@@ -313,6 +316,10 @@ def runAnimation():
             thread2.daemon = True
             thread2.start()
 
+            thread3 = threading.Thread(target=displayAngles)
+            thread3.daemon = True
+            thread3.start()
+
             timer = time.time()
             ani = animation.FuncAnimation(fig, animate, fargs=(xs, ys), interval=10)
             fig.tight_layout()
@@ -322,6 +329,33 @@ def playSong():
     global path
     playsound(path)
 
+def displayAngles():
+    global normLen1, normLen2
+    window = Tk()
+
+    window.title('Knee Angles')
+    window.geometry('600x300+100+100')
+
+    left = Label(window, text=round(normLen1), fg='Black', font=("Helvetica", 60))
+    leftText = Label(window, text="Left Angle", fg='Black', font=("Helvetica", 16))
+    left.place(x=120, y=150)
+    leftText.place(x=120, y=50)
+
+    right = Label(window, text=round(normLen2), fg='Black', font=("Helvetica", 60))
+    rightText = Label(window, text="Right Angle", fg='Black', font=("Helvetica", 16))
+    right.place(x=380, y=150)
+    rightText.place(x=380, y=50)
+
+    window.after(1, updateAngles, window, left, right)
+
+    window.mainloop()
+
+def updateAngles(window, left, right):
+    global normLen1, normLen2
+    left.config(text=round(normLen1))
+    right.config(text=round(normLen2))
+    window.after(1, updateAngles, window, left, right)
+    
 if __name__ == "__main__":
     thread1 = threading.Thread(target=main)
     thread1.daemon = True
