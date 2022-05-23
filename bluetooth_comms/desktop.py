@@ -16,31 +16,38 @@ from tkinter import *
 
 
 #Global variables
+#Knee Calibration values
 l0_1 = None
 l90_1 = None
 l0_2 = None
 l90_2 = None
 fullyCalibrate = False
+
+#Pi connection variables
 Pi_1_connected = False
 Pi_2_connected = False
 from_server_d1 = None
 from_server_d2 = None
+
+#Angle variables
 normLen1 = 0
 normLen2 = 0
+
+#BPM and music variables
 bpmObtained = False
 timePeriod = -1
 timer = 0
-timer2 = 0
 path = "music/playlists/90-100_bpm/Lynyrd Skynyrd - Sweet Home Alabama.wav"
 
 
 
-#Set up graphing stuff, xs(2) and ys(2) should be able to export to csv
+#Set up graphing stuff, xs(2) and ys(2) should be able to export to csv if need be
 fig = plt.figure(figsize=(10,8))
 ax = fig.add_subplot(111)
 ax1 = fig.add_subplot(211)
 ax2 = fig.add_subplot(212)
 
+#This is to make two subplots into one screen, with a common x and y axis
 ax.spines['top'].set_color('none')
 ax.spines['bottom'].set_color('none')
 ax.spines['left'].set_color('none')
@@ -53,6 +60,7 @@ ax.set_ylabel('Knee Angle (degrees)')
 ax1.set_title('Left Knee Angle')
 ax2.set_title('Right Knee Angle')
 
+#These variables store the data from the sensor, xs(2) stores the current times within the step period and ys(2) stores the associated knee angle
 xs = []
 ys = []
 xstemp = []
@@ -64,11 +72,12 @@ xs2temp = []
 ys2temp = []
 
 
-#Formula derived from own calculations, obtain the length
+#Formula derived from own calculations, return the string length given voltage
 def lengthVsVoltage(x):
     try:
         float(x)
         return (float(x) + 0.0729) / 0.0329
+    #Return nothing if a number could not be obtained
     except (ValueError, TypeError) as e:
         return None
     
@@ -78,14 +87,15 @@ def normalLen(x, l0, l90):
     try:
         res = ((x - l0) / (l90 - l0) )*90
         return res
+    #If any sensors have 0 length, something is probably not right
     except ZeroDivisionError:
         print("Recalibrate, division by 0!")
  
-#Establish the bluetooth sockets and timeout
+#Establish the bluetooth sockets
 blue_pi_1 = socket.socket(socket.AF_BLUETOOTH, socket.SOCK_STREAM, socket.BTPROTO_RFCOMM)
 blue_pi_2 = socket.socket(socket.AF_BLUETOOTH, socket.SOCK_STREAM, socket.BTPROTO_RFCOMM)
 
-#Hardcode the Pi bluetooth addresses
+#Hardcode the Pi bluetooth addresses, obtained from the Pis
 port = 4
 pi_1_addr = 'B8:27:EB:03:EB:6D'
 pi_2_addr = 'B8:27:EB:55:97:DE'
@@ -114,7 +124,7 @@ def calibrate():
         #Tell user sensor is calibrated
         print('Sensors are already calibrated!')
 
-#Function to test just one sensor
+#Function to test just one sensor if needed, pass in 1 for left knee, anything else for right knee
 def testCalibrate(num_sensor):
     global l0_1, l0_2, l90_1, l90_2, fullyCalibrate
 
@@ -171,6 +181,7 @@ def main():
             else:
                 blue_pi_1.sendall("1".encode())
         except socket.error:
+            #Attempt to reconnect to left knee sensor
             print("Lost connection to Pi 1, reconnect!")
             Pi_1_connected = False
             blue_pi_1.close()
@@ -187,11 +198,8 @@ def main():
             from_server_d1 = from_server_1.decode()
 
             #print("Data received!")
-            #Did you want to have a message processing thread so the listener doesnt stall?
             #Convert the voltage to length
             estLen_1 = lengthVsVoltage(from_server_d1)
-
-            #call update motion from gait_converter file
 
         #Check connection to Pi 2
         try:
@@ -201,6 +209,7 @@ def main():
             else:
                 blue_pi_2.sendall("2".encode())
         except socket.error:
+            #Attempt to reconnect to right knee sensor
             print("Lost connection to Pi 2, reconnect!")
             Pi_2_connected = False
             blue_pi_2.close()
@@ -226,6 +235,7 @@ def main():
             print('Calibrate the sensors !')
         else:
             #print('--------------------')
+            #Convert the lengths to angles
             normLen1 = normalLen(estLen_1, l0_1, l90_1)
             normLen2 = normalLen(estLen_2, l0_2, l90_2)
            
@@ -252,7 +262,7 @@ def animate(i, xs, ys):
         xs2.append(time.time() - timer)
         ys2.append(angle2)
 
-        #Calculate the number of elements needed to plot, denominator is animation rate
+        #Calculate the number of elements needed to plot, denominator is animation rate in seconds
         num_elem = round(timePeriod[0]/0.025)
 
         #Plot only elements in the current step (not really accurate)
@@ -262,8 +272,7 @@ def animate(i, xs, ys):
         xs2temp = xs2[-num_elem:]
         ys2temp = ys2[-num_elem:]
 
-        #Draw x and y lists
-
+        #Create the scatter dots
         ax1.clear()
         ax1.scatter(xstemp, ystemp)
 
@@ -305,57 +314,68 @@ def runAnimation():
             print("Song path does not exist!")
             sys.exit()
     else:
-        #Debug to set calibrate to true
+        #Debug variable to set calibrate to true
         #fullyCalibrate = True
         #Wait until sensors are calibrated
         while not fullyCalibrate:
             continue
         if fullyCalibrate:
-            #Play song in another thread to prevent blocking
+            #Play song in another thread to prevent blocking, could prob use a different library
             thread2 = threading.Thread(target=playSong)
             thread2.daemon = True
             thread2.start()
 
+            #Start another thread to display the knee angles
             thread3 = threading.Thread(target=displayAngles)
             thread3.daemon = True
             thread3.start()
 
+            #Start the timer and the animation
             timer = time.time()
-            ani = animation.FuncAnimation(fig, animate, fargs=(xs, ys), interval=10)
+            ani = animation.FuncAnimation(fig, animate, fargs=(xs, ys), interval=25)
             fig.tight_layout()
             plt.show()
 
+#Function to play the hardcoded song
 def playSong():
     global path
     playsound(path)
 
+#Function to show the knee angles
 def displayAngles():
     global normLen1, normLen2
+    #Tkinter stuff to display text within a separate window from the graph
     window = Tk()
 
+    #Set window GUI and size
     window.title('Knee Angles')
     window.geometry('600x300+100+100')
 
+    #Left knee title and angle
     left = Label(window, text=round(normLen1), fg='Black', font=("Helvetica", 60))
     leftText = Label(window, text="Left Angle", fg='Black', font=("Helvetica", 16))
     left.place(x=120, y=150)
     leftText.place(x=120, y=50)
 
+    #Right knee title and angle
     right = Label(window, text=round(normLen2), fg='Black', font=("Helvetica", 60))
     rightText = Label(window, text="Right Angle", fg='Black', font=("Helvetica", 16))
     right.place(x=380, y=150)
     rightText.place(x=380, y=50)
 
+    #Update the window's text every 1 ms
     window.after(1, updateAngles, window, left, right)
 
     window.mainloop()
 
+#Helper function to update the knee angles
 def updateAngles(window, left, right):
     global normLen1, normLen2
     left.config(text=round(normLen1))
     right.config(text=round(normLen2))
     window.after(1, updateAngles, window, left, right)
-    
+
+#Create the thread to run the animation    
 if __name__ == "__main__":
     thread1 = threading.Thread(target=main)
     thread1.daemon = True
