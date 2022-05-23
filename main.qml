@@ -15,8 +15,10 @@ ApplicationWindow {
       id: calibration
     }
 
-    // indicator for program starting
+    // indicator for a program starting
     property int starting: 0
+
+    // indicator for a current calibrated angle
     property int ninetyturn: 0
 
     // 6 base pages
@@ -75,16 +77,12 @@ ApplicationWindow {
         Label {
           anchors.centerIn: parent
         }
+        // 'Start' button on first home page
         Item {
           id: button_round
           width: 300
           height: 300
           property alias buttonText: innerText.text;
-          property color color: "white"
-          property color hoverColor: "#aaaaaa"
-          property int fontSize: 10
-          property int borderWidth: 1
-          property int borderRadius: 2
           scale: state === "Pressed" ? 0.96 : 1.0
           onEnabledChanged: state = ""
           signal clicked
@@ -152,7 +150,11 @@ ApplicationWindow {
             onClicked: {
               button_round.clicked();
               starting = 1
+
+              // move on the calibrating page
               stackView.replace(page1_2)
+
+              // this will run the desktop.py
               //calibration.cmdline("python ./bluetooth_comms/desktop.py")
             }
             onPressed: { button_round.state="Pressed" }
@@ -176,8 +178,7 @@ ApplicationWindow {
         Label {
           anchors.centerIn: parent
         }
-        focus: true
-        // calibrate at 0
+        // calibrate at 0 box
         Rectangle {
           anchors {
             top: parent.top
@@ -199,6 +200,7 @@ ApplicationWindow {
           height: 80
           color: "#E0E0E0"
         }
+        // colored indicator for 0 degree
         Rectangle {
           id: zerorec
           anchors {
@@ -212,7 +214,7 @@ ApplicationWindow {
           color: "red"
           radius: width*0.5
         }
-        // calibrate at 90
+        // calibrate at 90 box
         Rectangle {
           anchors {
             top: parent.top
@@ -234,6 +236,7 @@ ApplicationWindow {
           height: 80
           color: "#E0E0E0"
         }
+        // colored indicator for 90 degrees
         Rectangle {
           id: ninetyrec
           anchors {
@@ -247,7 +250,7 @@ ApplicationWindow {
           color: "red"
           radius: width*0.5
         }
-        // running
+        // running box
         Rectangle {
           anchors {
             top: parent.top
@@ -398,7 +401,7 @@ ApplicationWindow {
       }
     }
 
-    /* Connect page
+    /* Connect page (UNUSED)
        This page turns on and off bluetooth and shows available devices */
 /*
     Component {
@@ -478,6 +481,7 @@ ApplicationWindow {
         Label {
           anchors.centerIn: parent
         }
+        // image of legs
         Image {
             source: "images/legs.png"
             anchors {
@@ -487,6 +491,7 @@ ApplicationWindow {
               leftMargin: 40
             }
         }
+        // the box for showing current left and right angle, and pace/s
         Rectangle {
           anchors {
             top: parent.top
@@ -537,11 +542,6 @@ ApplicationWindow {
           width: 170
           height: 70
           property alias buttonText: innerText.text;
-          property color color: "white"
-          property color hoverColor: "#aaaaaa"
-          property int fontSize: 10
-          property int borderWidth: 1
-          property int borderRadius: 2
           scale: state === "Pressed" ? 0.96 : 1.0
           onEnabledChanged: state = ""
           signal clicked
@@ -624,17 +624,12 @@ ApplicationWindow {
           }
         }
 
-        // Start button
+        // Recalibrate button
         Item {
           id: button_2
           width: 170
           height: 70
           property alias buttonText: innerText.text;
-          property color color: "white"
-          property color hoverColor: "#aaaaaa"
-          property int fontSize: 10
-          property int borderWidth: 1
-          property int borderRadius: 2
           scale: state === "Pressed" ? 0.96 : 1.0
           onEnabledChanged: state = ""
           signal clicked
@@ -722,7 +717,7 @@ ApplicationWindow {
       }
     }
 
-    /* audio page
+    /* audio page (UNUSED)
        This page shows the list of songs and cover image
        User can choose the songs and adjust the volumes */
 /*
@@ -804,6 +799,11 @@ ApplicationWindow {
     }
 
 */
+
+    // setting page (UNUSED)
+    // currently does not have any items. This page will be used when it needs
+    // such as the imporing and exporing of user's information
+    // i.e. music list
 /*
     Component {
       id: page6
